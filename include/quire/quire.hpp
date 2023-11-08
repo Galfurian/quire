@@ -8,7 +8,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -91,12 +90,12 @@ inline std::string get_time()
 }
 
 /// @brief Defines the log levels.
-enum class log_level {
+enum log_level {
     debug    = 10, ///< Debug level.
     info     = 20, ///< Info level.
     warning  = 30, ///< Warning level.
     error    = 40, ///< Error level.
-    critical = 50, ///< Critical level.
+    critical = 50  ///< Critical level.
 };
 
 /// @brief Transforms the log level to string.
@@ -104,16 +103,16 @@ enum class log_level {
 /// @return the corresponding string.
 inline const char *log_level_to_string(log_level level)
 {
-    if (level == log_level::debug) {
+    if (level == debug) {
         return "debug";
     }
-    if (level == log_level::info) {
+    if (level == info) {
         return "info";
     }
-    if (level == log_level::warning) {
+    if (level == warning) {
         return "warning";
     }
-    if (level == log_level::error) {
+    if (level == error) {
         return "error";
     }
     return "critical";
@@ -182,7 +181,7 @@ private:
         show_date     = (1u << 1u), ///< We show the data.
         show_time     = (1u << 2u), ///< We show the time.
         show_colored  = (1u << 3u), ///< We show a colored log.
-        show_location = (1u << 4u), ///< We show the location inside the file.
+        show_location = (1u << 4u)  ///< We show the location inside the file.
     };
 
 public:
@@ -335,13 +334,13 @@ public:
 
         if (stream) {
             if (show_colored) {
-                if (level == log_level::critical) {
+                if (level == critical) {
                     (*stream) << ansi::fg::bright_red;
-                } else if (level == log_level::error) {
+                } else if (level == error) {
                     (*stream) << ansi::fg::red;
-                } else if (level == log_level::warning) {
+                } else if (level == warning) {
                     (*stream) << ansi::fg::bright_yellow;
-                } else if (level == log_level::info) {
+                } else if (level == info) {
                     (*stream) << ansi::fg::bright_white;
                 } else {
                     (*stream) << ansi::fg::cyan;
@@ -364,7 +363,7 @@ private:
 /// @brief Creates a new logger.
 inline std::unique_ptr<logger_t> get_logger()
 {
-    return std::make_unique<logger_t>("", log_level::info, '|');
+    return std::make_unique<logger_t>("", info, '|');
 }
 
 /// @brief Creates a new logger.
@@ -385,16 +384,16 @@ inline std::unique_ptr<file_handler_t> get_file_handler(const char *filename, co
 #define qlog(LOGGER, LEVEL, ...) (LOGGER->log(LEVEL, __FILE__, __LINE__, __VA_ARGS__))
 
 /// @brief Logs the debug message.
-#define qdebug(LOGGER, ...) qlog(LOGGER, quire::log_level::debug, __VA_ARGS__)
+#define qdebug(LOGGER, ...) qlog(LOGGER, quire::debug, __VA_ARGS__)
 
 /// @brief Logs the info message.
-#define qinfo(LOGGER, ...) qlog(LOGGER, quire::log_level::info, __VA_ARGS__)
+#define qinfo(LOGGER, ...) qlog(LOGGER, quire::info, __VA_ARGS__)
 
 /// @brief Logs the warning message.
-#define qwarning(LOGGER, ...) qlog(LOGGER, quire::log_level::warning, __VA_ARGS__)
+#define qwarning(LOGGER, ...) qlog(LOGGER, quire::warning, __VA_ARGS__)
 
 /// @brief Logs the error message.
-#define qerror(LOGGER, ...) qlog(LOGGER, quire::log_level::error, __VA_ARGS__)
+#define qerror(LOGGER, ...) qlog(LOGGER, quire::error, __VA_ARGS__)
 
 /// @brief Logs the critical message.
-#define qcritical(LOGGER, ...) qlog(LOGGER, quire::log_level::critical, __VA_ARGS__)
+#define qcritical(LOGGER, ...) qlog(LOGGER, quire::critical, __VA_ARGS__)
