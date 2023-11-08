@@ -6,6 +6,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -169,6 +170,10 @@ private:
     int config;
     /// @brief The character we use to separate elements of the log.
     char separator;
+    /// @brief Internal buffer for handling output formatting.
+    char *buffer;
+    /// @brief The current size of the buffer.
+    std::size_t buffer_length;
 
     /// @brief Configuration bitmasks.
     enum configuration {
@@ -189,9 +194,16 @@ public:
           header(_header),
           min_level(_min_level),
           config(0),
-          separator(_separator)
+          separator(_separator),
+          buffer(nullptr),
+          buffer_length(0)
     {
         // Nothing to do.
+    }
+
+    ~logger_t()
+    {
+        std::free(buffer);
     }
 
     /// @brief Sets the file handler.
@@ -278,8 +290,13 @@ public:
         va_list result_args;
         va_copy(result_args, length_args);
         const auto length = std::vsnprintf(nullptr, 0U, format, length_args);
-        std::string result(static_cast<std::string::size_type>(length), '\0');
-        std::vsprintf(result.data(), format, result_args);
+        if (length > 0) {
+            if (buffer_length < static_cast<std::size_t>(length)) {
+                buffer_length = static_cast<std::size_t>(length);
+                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length + 1));
+            }
+            std::vsprintf(buffer, format, result_args);
+        }
         va_end(result_args);
         va_end(length_args);
 
@@ -305,7 +322,7 @@ public:
         if (show_location) {
             ss << logger_t::assemble_location(file, line) << " " << separator << " ";
         }
-        ss << result << "\n";
+        ss << buffer << "\n";
 
         // == COLOR (OFF) =====================================================
 
@@ -338,9 +355,9 @@ public:
     }
 
 private:
-    static inline std::string assemble_location(char const *file, int line)
+    static inline std::string assemble_location(const std::string &file, int line)
     {
-        return std::string(std::filesystem::path(file).filename()) + ":" + std::to_string(line);
+        return file.substr(file.find_last_of("/\\") + 1) + ":" + std::to_string(line);
     }
 };
 
