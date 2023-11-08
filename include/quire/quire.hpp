@@ -22,52 +22,52 @@ namespace ansi
 {
 namespace fg
 {
-const char *black   = "\u001b[30m"; ///< ANSI foreground color black.
-const char *red     = "\u001b[31m"; ///< ANSI foreground color red.
-const char *green   = "\u001b[32m"; ///< ANSI foreground color green.
-const char *yellow  = "\u001b[33m"; ///< ANSI foreground color yellow.
-const char *blue    = "\u001b[34m"; ///< ANSI foreground color blue.
-const char *magenta = "\u001b[35m"; ///< ANSI foreground color magenta.
-const char *cyan    = "\u001b[36m"; ///< ANSI foreground color cyan.
-const char *white   = "\u001b[37m"; ///< ANSI foreground color white.
+const char *black   = "\33[30m"; ///< ANSI foreground color black.
+const char *red     = "\33[31m"; ///< ANSI foreground color red.
+const char *green   = "\33[32m"; ///< ANSI foreground color green.
+const char *yellow  = "\33[33m"; ///< ANSI foreground color yellow.
+const char *blue    = "\33[34m"; ///< ANSI foreground color blue.
+const char *magenta = "\33[35m"; ///< ANSI foreground color magenta.
+const char *cyan    = "\33[36m"; ///< ANSI foreground color cyan.
+const char *white   = "\33[37m"; ///< ANSI foreground color white.
 
-const char *bright_black   = "\u001b[30;1m"; ///< ANSI foreground color bright black.
-const char *bright_red     = "\u001b[31;1m"; ///< ANSI foreground color bright red.
-const char *bright_green   = "\u001b[32;1m"; ///< ANSI foreground color bright green.
-const char *bright_yellow  = "\u001b[33;1m"; ///< ANSI foreground color bright yellow.
-const char *bright_blue    = "\u001b[34;1m"; ///< ANSI foreground color bright blue.
-const char *bright_magenta = "\u001b[35;1m"; ///< ANSI foreground color bright magenta.
-const char *bright_cyan    = "\u001b[36;1m"; ///< ANSI foreground color bright cyan.
-const char *bright_white   = "\u001b[37;1m"; ///< ANSI foreground color bright white.
+const char *bright_black   = "\33[30;1m"; ///< ANSI foreground color bright black.
+const char *bright_red     = "\33[31;1m"; ///< ANSI foreground color bright red.
+const char *bright_green   = "\33[32;1m"; ///< ANSI foreground color bright green.
+const char *bright_yellow  = "\33[33;1m"; ///< ANSI foreground color bright yellow.
+const char *bright_blue    = "\33[34;1m"; ///< ANSI foreground color bright blue.
+const char *bright_magenta = "\33[35;1m"; ///< ANSI foreground color bright magenta.
+const char *bright_cyan    = "\33[36;1m"; ///< ANSI foreground color bright cyan.
+const char *bright_white   = "\33[37;1m"; ///< ANSI foreground color bright white.
 } // namespace fg
 
 namespace bg
 {
 
-const char *black   = "\u001b[40m"; ///< ANSI background color black.
-const char *red     = "\u001b[41m"; ///< ANSI background color red.
-const char *green   = "\u001b[42m"; ///< ANSI background color green.
-const char *yellow  = "\u001b[43m"; ///< ANSI background color yellow.
-const char *blue    = "\u001b[44m"; ///< ANSI background color blue.
-const char *magenta = "\u001b[45m"; ///< ANSI background color magenta.
-const char *cyan    = "\u001b[46m"; ///< ANSI background color cyan.
-const char *white   = "\u001b[47m"; ///< ANSI background color white.
+const char *black   = "\33[40m"; ///< ANSI background color black.
+const char *red     = "\33[41m"; ///< ANSI background color red.
+const char *green   = "\33[42m"; ///< ANSI background color green.
+const char *yellow  = "\33[43m"; ///< ANSI background color yellow.
+const char *blue    = "\33[44m"; ///< ANSI background color blue.
+const char *magenta = "\33[45m"; ///< ANSI background color magenta.
+const char *cyan    = "\33[46m"; ///< ANSI background color cyan.
+const char *white   = "\33[47m"; ///< ANSI background color white.
 } // namespace bg
 
 namespace util
 {
-const char *reset     = "\u001b[0m"; ///< Reset all styles.
-const char *bold      = "\u001b[1m"; ///< Turns on the bold text.
-const char *underline = "\u001b[4m"; ///< Turns on the underline text.
-const char *reverse   = "\u001b[7m"; ///< Turns on the reverse text.
-const char *clear     = "\u001b[2J"; ///< Clears entire screen.
-const char *clearline = "\u001b[2K"; ///< Clears entire line.
-const char *up        = "\u001b[1A"; ///< Moves the cursor up by one position.
-const char *down      = "\u001b[1B"; ///< Moves the cursor down by one position.
-const char *right     = "\u001b[1C"; ///< Moves the cursor right by one position.
-const char *left      = "\u001b[1D"; ///< Moves the cursor left by one position.
-const char *nextline  = "\u001b[1E"; ///< Move cursor to beginning of line, 1 line down.
-const char *prevline  = "\u001b[1F"; ///< Move cursor to beginning of line, 1 line up.
+const char *reset     = "\33[0m"; ///< Reset all styles.
+const char *bold      = "\33[1m"; ///< Turns on the bold text.
+const char *underline = "\33[4m"; ///< Turns on the underline text.
+const char *reverse   = "\33[7m"; ///< Turns on the reverse text.
+const char *clear     = "\33[2J"; ///< Clears entire screen.
+const char *clearline = "\33[2K"; ///< Clears entire line.
+const char *up        = "\33[1A"; ///< Moves the cursor up by one position.
+const char *down      = "\33[1B"; ///< Moves the cursor down by one position.
+const char *right     = "\33[1C"; ///< Moves the cursor right by one position.
+const char *left      = "\33[1D"; ///< Moves the cursor left by one position.
+const char *nextline  = "\33[1E"; ///< Move cursor to beginning of line, 1 line down.
+const char *prevline  = "\33[1F"; ///< Move cursor to beginning of line, 1 line up.
 } // namespace util
 } // namespace ansi
 
@@ -279,7 +279,7 @@ public:
         va_copy(result_args, length_args);
         const auto length = std::vsnprintf(nullptr, 0U, format, length_args);
         std::string result(static_cast<std::string::size_type>(length), '\0');
-        std::vsprintf(std::data(result), format, result_args);
+        std::vsprintf(result.data(), format, result_args);
         va_end(result_args);
         va_end(length_args);
 
