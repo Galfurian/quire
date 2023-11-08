@@ -238,31 +238,31 @@ public:
     /// @brief Turns on/off the level.
     void toggle_level(bool enable)
     {
-        (enable) ? (config |= configuration::show_level) : (config &= ~configuration::show_level);
+        (enable) ? (config |= show_level) : (config &= ~show_level);
     }
 
     /// @brief Turns on/off the color.
     void toggle_color(bool enable)
     {
-        (enable) ? (config |= configuration::show_colored) : (config &= ~configuration::show_colored);
+        (enable) ? (config |= show_colored) : (config &= ~show_colored);
     }
 
     /// @brief Turns on/off the date.
     void toggle_date(bool enable)
     {
-        (enable) ? (config |= configuration::show_date) : (config &= ~configuration::show_date);
+        (enable) ? (config |= show_date) : (config &= ~show_date);
     }
 
     /// @brief Turns on/off the time.
     void toggle_time(bool enable)
     {
-        (enable) ? (config |= configuration::show_time) : (config &= ~configuration::show_time);
+        (enable) ? (config |= show_time) : (config &= ~show_time);
     }
 
     /// @brief Turns on/off the location inside the file.
     void toggle_location(bool enable)
     {
-        (enable) ? (config |= configuration::show_location) : (config &= ~configuration::show_location);
+        (enable) ? (config |= show_location) : (config &= ~show_location);
     }
 
     /// @brief Perform the logging.
@@ -276,11 +276,11 @@ public:
 
         // == FLAGS ==========================================================
 
-        bool show_level    = config & configuration::show_level;
-        bool show_date     = config & configuration::show_date;
-        bool show_time     = config & configuration::show_time;
-        bool show_colored  = config & configuration::show_colored;
-        bool show_location = config & configuration::show_location;
+        bool _show_level    = config & show_level;
+        bool _show_date     = config & show_date;
+        bool _show_time     = config & show_time;
+        bool _show_colored  = config & show_colored;
+        bool _show_location = config & show_location;
 
         // == BUILD LOG =======================================================
 
@@ -306,19 +306,19 @@ public:
         if (!header.empty()) {
             ss << header << " " << separator << " ";
         }
-        if (show_level) {
+        if (_show_level) {
             ss << std::left << std::setw(9) << quire::log_level_to_string(level) << separator << " ";
         }
-        if (show_date) {
+        if (_show_date) {
             ss << quire::get_date() << " ";
-            if (!show_time) {
+            if (!_show_time) {
                 ss << separator << " ";
             }
         }
-        if (show_time) {
+        if (_show_time) {
             ss << quire::get_time() << " " << separator << " ";
         }
-        if (show_location) {
+        if (_show_location) {
             ss << logger_t::assemble_location(file, line) << " " << separator << " ";
         }
         ss << buffer << "\n";
@@ -333,7 +333,7 @@ public:
         // == COLOR (ON) ======================================================
 
         if (stream) {
-            if (show_colored) {
+            if (_show_colored) {
                 if (level == critical) {
                     (*stream) << ansi::fg::bright_red;
                 } else if (level == error) {
@@ -347,7 +347,7 @@ public:
                 }
             }
             (*stream) << ss.str();
-            if (show_colored) {
+            if (_show_colored) {
                 (*stream) << ansi::util::reset;
             }
         }
