@@ -6,14 +6,12 @@ on:
         paths-ignore:
             - "**.md"
             - ".gitignore"
-            - "macos.yml"
             - "windows.yml"
             - "ubuntu.yml"
     pull_request:
         paths-ignore:
             - "**.md"
             - ".gitignore"
-            - "macos.yml"
             - "windows.yml"
             - "ubuntu.yml"
 jobs:

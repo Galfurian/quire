@@ -288,13 +288,13 @@ public:
         va_start(length_args, format);
         va_list result_args;
         va_copy(result_args, length_args);
-        const auto length = std::vsnprintf(nullptr, 0U, format, length_args);
+        const int length = std::vsnprintf(nullptr, 0U, format, length_args);
         if (length > 0) {
             if (buffer_length < static_cast<std::size_t>(length)) {
                 buffer_length = static_cast<std::size_t>(length);
                 buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length + 1));
             }
-            std::vsprintf(buffer, format, result_args);
+            std::vsnprintf(buffer, buffer_length, format, result_args);
         }
         va_end(result_args);
         va_end(length_args);
