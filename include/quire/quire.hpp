@@ -4,17 +4,9 @@
 
 #pragma once
 
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <memory>
 #include <mutex>
-#include <sstream>
-#include <string>
 
 namespace quire
 {
@@ -22,72 +14,52 @@ namespace ansi
 {
 namespace fg
 {
-const char *black   = "\33[30m"; ///< ANSI foreground color black.
-const char *red     = "\33[31m"; ///< ANSI foreground color red.
-const char *green   = "\33[32m"; ///< ANSI foreground color green.
-const char *yellow  = "\33[33m"; ///< ANSI foreground color yellow.
-const char *blue    = "\33[34m"; ///< ANSI foreground color blue.
-const char *magenta = "\33[35m"; ///< ANSI foreground color magenta.
-const char *cyan    = "\33[36m"; ///< ANSI foreground color cyan.
-const char *white   = "\33[37m"; ///< ANSI foreground color white.
-
-const char *bright_black   = "\33[30;1m"; ///< ANSI foreground color bright black.
-const char *bright_red     = "\33[31;1m"; ///< ANSI foreground color bright red.
-const char *bright_green   = "\33[32;1m"; ///< ANSI foreground color bright green.
-const char *bright_yellow  = "\33[33;1m"; ///< ANSI foreground color bright yellow.
-const char *bright_blue    = "\33[34;1m"; ///< ANSI foreground color bright blue.
-const char *bright_magenta = "\33[35;1m"; ///< ANSI foreground color bright magenta.
-const char *bright_cyan    = "\33[36;1m"; ///< ANSI foreground color bright cyan.
-const char *bright_white   = "\33[37;1m"; ///< ANSI foreground color bright white.
+// Normal colors.
+extern const char *black;   ///< ANSI foreground color black.
+extern const char *red;     ///< ANSI foreground color red.
+extern const char *green;   ///< ANSI foreground color green.
+extern const char *yellow;  ///< ANSI foreground color yellow.
+extern const char *blue;    ///< ANSI foreground color blue.
+extern const char *magenta; ///< ANSI foreground color magenta.
+extern const char *cyan;    ///< ANSI foreground color cyan.
+extern const char *white;   ///< ANSI foreground color white.
+// Bright colors.
+extern const char *bright_black;   ///< ANSI foreground color bright black.
+extern const char *bright_red;     ///< ANSI foreground color bright red.
+extern const char *bright_green;   ///< ANSI foreground color bright green.
+extern const char *bright_yellow;  ///< ANSI foreground color bright yellow.
+extern const char *bright_blue;    ///< ANSI foreground color bright blue.
+extern const char *bright_magenta; ///< ANSI foreground color bright magenta.
+extern const char *bright_cyan;    ///< ANSI foreground color bright cyan.
+extern const char *bright_white;   ///< ANSI foreground color bright white.
 } // namespace fg
-
 namespace bg
 {
-
-const char *black   = "\33[40m"; ///< ANSI background color black.
-const char *red     = "\33[41m"; ///< ANSI background color red.
-const char *green   = "\33[42m"; ///< ANSI background color green.
-const char *yellow  = "\33[43m"; ///< ANSI background color yellow.
-const char *blue    = "\33[44m"; ///< ANSI background color blue.
-const char *magenta = "\33[45m"; ///< ANSI background color magenta.
-const char *cyan    = "\33[46m"; ///< ANSI background color cyan.
-const char *white   = "\33[47m"; ///< ANSI background color white.
+extern const char *black;   ///< ANSI background color black.
+extern const char *red;     ///< ANSI background color red.
+extern const char *green;   ///< ANSI background color green.
+extern const char *yellow;  ///< ANSI background color yellow.
+extern const char *blue;    ///< ANSI background color blue.
+extern const char *magenta; ///< ANSI background color magenta.
+extern const char *cyan;    ///< ANSI background color cyan.
+extern const char *white;   ///< ANSI background color white.
 } // namespace bg
-
 namespace util
 {
-const char *reset     = "\33[0m"; ///< Reset all styles.
-const char *bold      = "\33[1m"; ///< Turns on the bold text.
-const char *underline = "\33[4m"; ///< Turns on the underline text.
-const char *reverse   = "\33[7m"; ///< Turns on the reverse text.
-const char *clear     = "\33[2J"; ///< Clears entire screen.
-const char *clearline = "\33[2K"; ///< Clears entire line.
-const char *up        = "\33[1A"; ///< Moves the cursor up by one position.
-const char *down      = "\33[1B"; ///< Moves the cursor down by one position.
-const char *right     = "\33[1C"; ///< Moves the cursor right by one position.
-const char *left      = "\33[1D"; ///< Moves the cursor left by one position.
-const char *nextline  = "\33[1E"; ///< Move cursor to beginning of line, 1 line down.
-const char *prevline  = "\33[1F"; ///< Move cursor to beginning of line, 1 line up.
+extern const char *reset;     ///< Reset all styles.
+extern const char *bold;      ///< Turns on the bold text.
+extern const char *underline; ///< Turns on the underline text.
+extern const char *reverse;   ///< Turns on the reverse text.
+extern const char *clear;     ///< Clears entire screen.
+extern const char *clearline; ///< Clears entire line.
+extern const char *up;        ///< Moves the cursor up by one position.
+extern const char *down;      ///< Moves the cursor down by one position.
+extern const char *right;     ///< Moves the cursor right by one position.
+extern const char *left;      ///< Moves the cursor left by one position.
+extern const char *nextline;  ///< Move cursor to beginning of line, 1 line down.
+extern const char *prevline;  ///< Move cursor to beginning of line, 1 line up.
 } // namespace util
 } // namespace ansi
-
-/// @brief Get the current date.
-inline std::string get_date()
-{
-    char buffer[32];
-    time_t now = time(nullptr);
-    strftime(buffer, 32, "%d/%m/%y", localtime(&now));
-    return std::string(buffer);
-}
-
-/// @brief Get the current time.
-inline std::string get_time()
-{
-    char buffer[32];
-    time_t now = time(nullptr);
-    strftime(buffer, 32, "%H:%M", localtime(&now));
-    return std::string(buffer);
-}
 
 /// @brief Defines the log levels.
 enum log_level {
@@ -98,25 +70,16 @@ enum log_level {
     critical = 50  ///< Critical level.
 };
 
-/// @brief Transforms the log level to string.
-/// @param level the log level.
-/// @return the corresponding string.
-inline const char *log_level_to_string(log_level level)
-{
-    if (level == debug) {
-        return "debug";
-    }
-    if (level == info) {
-        return "info";
-    }
-    if (level == warning) {
-        return "warning";
-    }
-    if (level == error) {
-        return "error";
-    }
-    return "critical";
-}
+/// @brief Configuration bitmasks.
+enum configuration {
+    show_nothing  = 0u,                                                               ///< No bit.
+    show_level    = (1u << 0u),                                                       ///< We show the log level.
+    show_date     = (1u << 1u),                                                       ///< We show the data.
+    show_time     = (1u << 2u),                                                       ///< We show the time.
+    show_colored  = (1u << 3u),                                                       ///< We show a colored log.
+    show_location = (1u << 4u),                                                       ///< We show the location inside the file.
+    show_all      = show_level | show_date | show_time | show_colored | show_location ///< We show everything.
+};
 
 /// @brief Handles output files.
 class file_handler_t {
@@ -128,35 +91,22 @@ public:
     /// @brief Construct the handler and opens the file.
     /// @param filename the filename.
     /// @param mode the mode with which we open it.
-    file_handler_t(const char *filename, const char *mode)
-        : stream(fopen(filename, mode))
-    {
-        // Nothing to do.
-    }
+    file_handler_t(const char *filename, const char *mode);
 
     /// @brief Destroy the handler and closes the file.
-    ~file_handler_t()
-    {
-        fclose(stream);
-    }
+    ~file_handler_t();
 
     /// @brief Writes the buffer on file, if the handler is valid.
     /// @param buffer the buffer to write.
     /// @return how much we wrote, 0 if we write nothing.
-    std::size_t write(const std::string &buffer)
-    {
-        if (stream) {
-            return fwrite(buffer.c_str(), buffer.size(), 1, stream);
-        }
-        return 0;
-    }
+    std::size_t write(const std::string &buffer);
 };
 
 /// @brief The logger class.
 class logger_t {
 private:
     /// @brief A pointer to the file handler.
-    std::unique_ptr<file_handler_t> fhandler;
+    std::shared_ptr<file_handler_t> fhandler;
     /// @brief A pointer to the output stream.
     std::ostream *stream;
     /// @brief A mutex to protect the use of the logger.
@@ -174,226 +124,71 @@ private:
     /// @brief The current size of the buffer.
     std::size_t buffer_length;
 
-    /// @brief Configuration bitmasks.
-    enum configuration {
-        none          = 0u,         ///< No bit.
-        show_level    = (1u << 0u), ///< We show the log level.
-        show_date     = (1u << 1u), ///< We show the data.
-        show_time     = (1u << 2u), ///< We show the time.
-        show_colored  = (1u << 3u), ///< We show a colored log.
-        show_location = (1u << 4u)  ///< We show the location inside the file.
-    };
-
 public:
     /// @brief Construct a new logger.
-    explicit logger_t(std::string _header, log_level _min_level, char _separator)
-        : fhandler(),
-          stream(&std::cout),
-          mtx(),
-          header(_header),
-          min_level(_min_level),
-          config(0),
-          separator(_separator),
-          buffer(nullptr),
-          buffer_length(0)
-    {
-        // Nothing to do.
-    }
+    explicit logger_t(std::string _header, log_level _min_level, char _separator);
 
-    ~logger_t()
-    {
-        std::free(buffer);
-    }
+    ~logger_t();
 
     /// @brief Sets the file handler.
-    void set_file_handler(std::unique_ptr<file_handler_t> &_fhandler)
-    {
-        fhandler = std::move(_fhandler);
-    }
+    void set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
 
     /// @brief Sets the output stream.
-    void set_output_stream(std::ostream *_stream)
-    {
-        stream = _stream;
-    }
+    void set_output_stream(std::ostream *_stream);
 
     /// @brief Sets the header.
-    void set_header(std::string _header)
-    {
-        header = _header;
-    }
+    void set_header(std::string _header);
 
     /// @brief Sets the log level.
-    void set_log_level(log_level _level)
-    {
-        min_level = _level;
-    }
+    void set_log_level(log_level _level);
 
     /// @brief Sets the separator.
-    void set_separator(char _separator)
-    {
-        separator = _separator;
-    }
+    void set_separator(char _separator);
 
     /// @brief Turns on/off the level.
-    void toggle_level(bool enable)
-    {
-        (enable) ? (config |= show_level) : (config &= ~show_level);
-    }
+    void configure(int _config);
+
+    /// @brief Turns on/off the level.
+    void toggle_level(bool enable);
 
     /// @brief Turns on/off the color.
-    void toggle_color(bool enable)
-    {
-        (enable) ? (config |= show_colored) : (config &= ~show_colored);
-    }
+    void toggle_color(bool enable);
 
     /// @brief Turns on/off the date.
-    void toggle_date(bool enable)
-    {
-        (enable) ? (config |= show_date) : (config &= ~show_date);
-    }
+    void toggle_date(bool enable);
 
     /// @brief Turns on/off the time.
-    void toggle_time(bool enable)
-    {
-        (enable) ? (config |= show_time) : (config &= ~show_time);
-    }
+    void toggle_time(bool enable);
 
     /// @brief Turns on/off the location inside the file.
-    void toggle_location(bool enable)
-    {
-        (enable) ? (config |= show_location) : (config &= ~show_location);
-    }
+    void toggle_location(bool enable);
 
     /// @brief Perform the logging.
-    void log(log_level level, char const *file, int line, char const *format, ...)
-    {
-        std::unique_lock<std::mutex> lock(mtx);
+    void log(log_level level, char const *format, ...);
 
-        if (level < min_level) {
-            return;
-        }
-
-        // == FLAGS ==========================================================
-
-        bool _show_level    = config & show_level;
-        bool _show_date     = config & show_date;
-        bool _show_time     = config & show_time;
-        bool _show_colored  = config & show_colored;
-        bool _show_location = config & show_location;
-
-        // == BUILD LOG =======================================================
-
-        va_list length_args;
-        va_start(length_args, format);
-        va_list result_args;
-        va_copy(result_args, length_args);
-        const int length = std::vsnprintf(nullptr, 0U, format, length_args);
-        if (length > 0) {
-            if (buffer_length < static_cast<std::size_t>(length)) {
-                buffer_length = static_cast<std::size_t>(length);
-                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length + 1));
-            }
-            std::vsnprintf(buffer, buffer_length, format, result_args);
-        }
-        va_end(result_args);
-        va_end(length_args);
-
-        // == STREAM ==========================================================
-        std::stringstream ss;
-
-        // == LOG =============================================================
-        if (!header.empty()) {
-            ss << header << " " << separator << " ";
-        }
-        if (_show_level) {
-            ss << std::left << std::setw(9) << quire::log_level_to_string(level) << separator << " ";
-        }
-        if (_show_date) {
-            ss << quire::get_date() << " ";
-            if (!_show_time) {
-                ss << separator << " ";
-            }
-        }
-        if (_show_time) {
-            ss << quire::get_time() << " " << separator << " ";
-        }
-        if (_show_location) {
-            ss << logger_t::assemble_location(file, line) << " " << separator << " ";
-        }
-        ss << buffer << "\n";
-
-        // == COLOR (OFF) =====================================================
-
-        // == WRITE STREAM ====================================================
-        if (fhandler) {
-            fhandler->write(ss.str());
-        }
-
-        // == COLOR (ON) ======================================================
-
-        if (stream) {
-            if (_show_colored) {
-                if (level == critical) {
-                    (*stream) << ansi::fg::bright_red;
-                } else if (level == error) {
-                    (*stream) << ansi::fg::red;
-                } else if (level == warning) {
-                    (*stream) << ansi::fg::bright_yellow;
-                } else if (level == info) {
-                    (*stream) << ansi::fg::bright_white;
-                } else {
-                    (*stream) << ansi::fg::cyan;
-                }
-            }
-            (*stream) << ss.str();
-            if (_show_colored) {
-                (*stream) << ansi::util::reset;
-            }
-        }
-    }
+    /// @brief Perform the logging.
+    void log(log_level level, char const *file, int line, char const *format, ...);
 
 private:
-    static inline std::string assemble_location(const std::string &file, int line)
-    {
-        return file.substr(file.find_last_of("/\\") + 1) + ":" + std::to_string(line);
-    }
+    void do_log(log_level level, const std::string &location) const;
 };
-
-/// @brief Creates a new logger.
-inline std::unique_ptr<logger_t> get_logger()
-{
-    return std::make_unique<logger_t>("", info, '|');
-}
-
-/// @brief Creates a new logger.
-inline std::unique_ptr<logger_t> get_logger(std::string _header, log_level _min_level, char _separator)
-{
-    return std::make_unique<logger_t>(_header, _min_level, _separator);
-}
-
-/// @brief Creates a new file handler.
-inline std::unique_ptr<file_handler_t> get_file_handler(const char *filename, const char *mode)
-{
-    return std::make_unique<file_handler_t>(filename, mode);
-}
 
 } // namespace quire
 
 /// @brief Logs the message, with the given level.
-#define qlog(LOGGER, LEVEL, ...) (LOGGER->log(LEVEL, __FILE__, __LINE__, __VA_ARGS__))
+#define qlog(logger, level, ...) logger->log(level, __FILE__, __LINE__, __VA_ARGS__)
 
 /// @brief Logs the debug message.
-#define qdebug(LOGGER, ...) qlog(LOGGER, quire::debug, __VA_ARGS__)
+#define qdebug(logger, ...) qlog(logger, quire::debug, __VA_ARGS__)
 
 /// @brief Logs the info message.
-#define qinfo(LOGGER, ...) qlog(LOGGER, quire::info, __VA_ARGS__)
+#define qinfo(logger, ...) qlog(logger, quire::info, __VA_ARGS__)
 
 /// @brief Logs the warning message.
-#define qwarning(LOGGER, ...) qlog(LOGGER, quire::warning, __VA_ARGS__)
+#define qwarning(logger, ...) qlog(logger, quire::warning, __VA_ARGS__)
 
 /// @brief Logs the error message.
-#define qerror(LOGGER, ...) qlog(LOGGER, quire::error, __VA_ARGS__)
+#define qerror(logger, ...) qlog(logger, quire::error, __VA_ARGS__)
 
 /// @brief Logs the critical message.
-#define qcritical(LOGGER, ...) qlog(LOGGER, quire::critical, __VA_ARGS__)
+#define qcritical(logger, ...) qlog(logger, quire::critical, __VA_ARGS__)
