@@ -113,7 +113,9 @@ file_handler_t::file_handler_t(const char *filename, const char *mode)
 
 file_handler_t::~file_handler_t()
 {
-    fclose(stream);
+    if (stream) {
+        fclose(stream);
+    }
 }
 
 std::size_t file_handler_t::write(const std::string &buffer)
@@ -231,9 +233,9 @@ void logger_t::log(log_level level, char const *format, ...)
         va_copy(result_args, length_args);
         const int length = std::vsnprintf(nullptr, 0U, format, length_args);
         if (length > 0) {
-            if (buffer_length < static_cast<std::size_t>(length)) {
-                buffer_length = static_cast<std::size_t>(length);
-                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length + 1));
+            if (buffer_length < static_cast<std::size_t>(length) + 1) {
+                buffer_length = static_cast<std::size_t>(length) + 1;
+                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
             }
             std::vsnprintf(buffer, buffer_length, format, result_args);
         }
@@ -258,9 +260,9 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
         va_copy(result_args, length_args);
         const int length = std::vsnprintf(nullptr, 0U, format, length_args);
         if (length > 0) {
-            if (buffer_length < static_cast<std::size_t>(length)) {
-                buffer_length = static_cast<std::size_t>(length);
-                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length + 1));
+            if (buffer_length < static_cast<std::size_t>(length) + 1) {
+                buffer_length = static_cast<std::size_t>(length) + 1;
+                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
             }
             std::vsnprintf(buffer, buffer_length, format, result_args);
         }

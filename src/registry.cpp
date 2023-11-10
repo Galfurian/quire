@@ -8,6 +8,19 @@
 namespace quire
 {
 
+registry_t::registry_t()
+    : m_map(),
+      mtx()
+{
+    // Nothing to do.
+}
+
+registry_t &registry_t::instance()
+{
+    static registry_t registry;
+    return registry;
+}
+
 std::size_t registry_t::size() const
 {
     return m_map.size();
@@ -16,6 +29,11 @@ std::size_t registry_t::size() const
 bool registry_t::empty() const
 {
     return m_map.empty();
+}
+
+const registry_t::map_t &registry_t::loggers() const
+{
+    return m_map;
 }
 
 registry_t::value_t registry_t::create(key_t key, std::string _header, log_level _min_level, char _separator)
@@ -100,6 +118,24 @@ const registry_t::value_t registry_t::operator[](key_t key) const
     return it->second;
 }
 
-registry_t registry;
+registry_t::value_t get_logger(registry_t::key_t key)
+{
+    return registry_t::instance().get(key);
+}
+
+registry_t::value_t create_logger(registry_t::key_t key, std::string _header, quire::log_level _min_level, char _separator)
+{
+    return registry_t::instance().create(key, _header, _min_level, _separator);
+}
+
+registry_t::value_t remove_logger(registry_t::key_t key)
+{
+    return registry_t::instance().remove(key);
+}
+
+const registry_t::map_t &get_loggers()
+{
+    return registry_t::instance().loggers();
+}
 
 } // namespace quire

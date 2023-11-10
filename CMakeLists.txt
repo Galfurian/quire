@@ -102,6 +102,11 @@ if(BUILD_EXAMPLES)
     # Set the linked libraries.
     target_link_libraries(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_NAME})
     
+    # Add the example.
+    add_executable(${PROJECT_NAME}_example_log_file ${PROJECT_SOURCE_DIR}/examples/example_log_file.cpp)
+    # Set the linked libraries.
+    target_link_libraries(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_NAME})
+    
 endif()
 
 # -----------------------------------------------------------------------------

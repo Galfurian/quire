@@ -32,9 +32,13 @@ public:
     using iterator       = typename map_t::iterator;
     using const_iterator = typename map_t::const_iterator;
 
+    explicit registry_t();
+
     std::size_t size() const;
 
     bool empty() const;
+    
+    const map_t &loggers() const;
 
     value_t create(key_t key, std::string _header, log_level _min_level, char _separator);
 
@@ -52,6 +56,8 @@ public:
 
     const value_t operator[](key_t key) const;
 
+    static registry_t &instance();
+
 private:
     /// @brief Maps loggers name and their instance.
     map_t m_map;
@@ -59,6 +65,12 @@ private:
     std::mutex mtx;
 };
 
-extern registry_t registry;
+registry_t::value_t get_logger(registry_t::key_t key);
+
+registry_t::value_t create_logger(registry_t::key_t key, std::string _header, quire::log_level _min_level, char _separator);
+
+registry_t::value_t remove_logger(registry_t::key_t key);
+
+const registry_t::map_t &get_loggers();
 
 } // namespace quire
