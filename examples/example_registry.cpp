@@ -32,10 +32,10 @@ void function_3()
     quire::registry_t::value_t pvp;
     try {
         pvp = quire::get_logger("pvp");
-    } catch (quire::registry_exception_t const &re_get) {
+    } catch (quire::registry_exception_t const &) {
         try {
             pvp = quire::create_logger("pvp", "pvp", quire::log_level::debug, '|');
-        } catch (quire::registry_exception_t const &re_create) {
+        } catch (quire::registry_exception_t const &) {
             std::cout << "Failed to create logger.\n";
             std::exit(1);
         }
