@@ -21,16 +21,6 @@ registry_t &registry_t::instance()
     return registry;
 }
 
-std::size_t registry_t::size() const
-{
-    return m_map.size();
-}
-
-bool registry_t::empty() const
-{
-    return m_map.empty();
-}
-
 const registry_t::map_t &registry_t::loggers() const
 {
     return m_map;

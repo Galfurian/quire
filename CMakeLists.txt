@@ -152,5 +152,8 @@ if(DOXYGEN_FOUND)
         ${PROJECT_NAME}_documentation
         ${PROJECT_SOURCE_DIR}/README.md
         ${PROJECT_SOURCE_DIR}/include/quire/quire.hpp
+        ${PROJECT_SOURCE_DIR}/include/quire/registry.hpp
+        ${PROJECT_SOURCE_DIR}/src/quire.cpp
+        ${PROJECT_SOURCE_DIR}/src/registry.cpp
     )
 endif()

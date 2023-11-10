@@ -135,6 +135,9 @@ private:
 
 public:
     /// @brief Construct a new logger.
+    /// @param _header the header shown every time the log is printed.
+    /// @param _min_level the minimal level we will print for this logger.
+    /// @param _separator the semparator used for dividing all the log information.
     explicit logger_t(std::string _header, log_level _min_level, char _separator);
 
     ~logger_t();
