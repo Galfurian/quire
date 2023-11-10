@@ -8,10 +8,13 @@
 #include <memory>
 #include <mutex>
 
+/// @brief Quire source code.
 namespace quire
 {
+/// @brief ANSI escape codes.
 namespace ansi
 {
+/// @brief Foreground colors.
 namespace fg
 {
 // Normal colors.
@@ -33,6 +36,7 @@ extern const char *bright_magenta; ///< ANSI foreground color bright magenta.
 extern const char *bright_cyan;    ///< ANSI foreground color bright cyan.
 extern const char *bright_white;   ///< ANSI foreground color bright white.
 } // namespace fg
+/// @brief Background colors.
 namespace bg
 {
 extern const char *black;   ///< ANSI background color black.
@@ -44,6 +48,7 @@ extern const char *magenta; ///< ANSI background color magenta.
 extern const char *cyan;    ///< ANSI background color cyan.
 extern const char *white;   ///< ANSI background color white.
 } // namespace bg
+/// @brief Utility escape codes.
 namespace util
 {
 extern const char *reset;     ///< Reset all styles.
