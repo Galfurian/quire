@@ -14,6 +14,7 @@
 // #include <exception>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 // #include <memory>
 // #include <sstream>
@@ -103,9 +104,9 @@ static inline const char *__log_level_to_string(log_level level)
 /// @brief Combines filename and line number.
 static inline std::string __assemble_location(const std::string &file, int line)
 {
-    std::ostringstream oss;
-    oss << line;
-    return file.substr(file.find_last_of("/\\") + 1) + ":" + oss.str();
+    std::stringstream ss;
+    ss << line;
+    return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
 file_handler_t::file_handler_t(const char *filename, const char *mode)
