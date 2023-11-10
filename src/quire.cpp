@@ -133,9 +133,22 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
       config(0),
       separator(_separator),
       buffer(nullptr),
-      buffer_length(0)
+      buffer_length(0),
+      fg_colors(),
+      bg_colors()
 {
-    // Nothing to do.
+    // Default foreground colors.
+    fg_colors[debug]    = ansi::fg::cyan;
+    fg_colors[info]     = ansi::fg::bright_white;
+    fg_colors[warning]  = ansi::fg::bright_yellow;
+    fg_colors[error]    = ansi::fg::red;
+    fg_colors[critical] = ansi::fg::bright_red;
+    // By default we do not have background colors.
+    bg_colors[debug]    = quire::ansi::util::reset;
+    bg_colors[info]     = quire::ansi::util::reset;
+    bg_colors[warning]  = quire::ansi::util::reset;
+    bg_colors[error]    = quire::ansi::util::reset;
+    bg_colors[critical] = quire::ansi::util::reset;
 }
 
 logger_t::~logger_t()
@@ -166,6 +179,14 @@ void logger_t::set_log_level(log_level _level)
 void logger_t::set_separator(char _separator)
 {
     separator = _separator;
+}
+
+void logger_t::set_color(log_level level, const char *fg, const char *bg)
+{
+    if ((level >= debug) && (level <= critical)) {
+        fg_colors[level] = fg;
+        bg_colors[level] = bg;
+    }
 }
 
 void logger_t::configure(int _config)
@@ -200,7 +221,7 @@ void logger_t::toggle_location(bool enable)
 
 void logger_t::log(log_level level, char const *format, ...)
 {
-    std::unique_lock<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(mtx);
     if (level >= min_level) {
         // == BUILD LOG =======================================================
 
@@ -227,7 +248,7 @@ void logger_t::log(log_level level, char const *format, ...)
 
 void logger_t::log(log_level level, char const *file, int line, char const *format, ...)
 {
-    std::unique_lock<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(mtx);
     if (level >= min_level) {
         // == BUILD LOG =======================================================
 
@@ -254,17 +275,16 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
 
 void logger_t::do_log(log_level level, const std::string &location) const
 {
-    // == FLAGS ==========================================================
-    bool _show_level    = config & show_level;
-    bool _show_date     = config & show_date;
-    bool _show_time     = config & show_time;
-    bool _show_colored  = config & show_colored;
-    bool _show_location = config & show_location;
-
-    // == STREAM ==========================================================
     std::stringstream ss;
 
-    // == LOG =============================================================
+    // == FLAGS ==========================================================
+    bool _show_level    = (config & show_level) == show_level;
+    bool _show_date     = (config & show_date) == show_date;
+    bool _show_time     = (config & show_time) == show_time;
+    bool _show_colored  = (config & show_colored) == show_colored;
+    bool _show_location = (config & show_location) == show_location;
+
+    // == LOG INFORMATION =====================================================
     if (!header.empty()) {
         ss << header << " " << separator << " ";
     }
@@ -285,30 +305,21 @@ void logger_t::do_log(log_level level, const std::string &location) const
     }
     ss << buffer << "\n";
 
-    // == COLOR (OFF) =====================================================
-
-    // == WRITE STREAM ====================================================
+    // == WRITE TO FILE STREAM ================================================
     if (fhandler) {
         fhandler->write(ss.str());
     }
 
-    // == COLOR (ON) ======================================================
-
     if (stream) {
-        if (_show_colored) {
-            if (level == critical) {
-                (*stream) << ansi::fg::bright_red;
-            } else if (level == error) {
-                (*stream) << ansi::fg::red;
-            } else if (level == warning) {
-                (*stream) << ansi::fg::bright_yellow;
-            } else if (level == info) {
-                (*stream) << ansi::fg::bright_white;
-            } else {
-                (*stream) << ansi::fg::cyan;
-            }
+        // == COLOR (ON) ======================================================
+        if (_show_colored && (level >= debug) && (level <= critical)) {
+            (*stream) << bg_colors[level] << fg_colors[level];
         }
+
+        // == WRITE STREAM ====================================================
         (*stream) << ss.str();
+
+        // == COLOR (OFF) =====================================================
         if (_show_colored) {
             (*stream) << ansi::util::reset;
         }

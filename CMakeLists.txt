@@ -93,14 +93,14 @@ endif()
 if(BUILD_EXAMPLES)
 
     # Add the example.
-    add_executable(${PROJECT_NAME}_example_basic ${PROJECT_SOURCE_DIR}/examples/example_basic.cpp)
+    add_executable(${PROJECT_NAME}_example_quire ${PROJECT_SOURCE_DIR}/examples/example_quire.cpp)
     # Set the linked libraries.
-    target_link_libraries(${PROJECT_NAME}_example_basic PUBLIC ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}_example_quire PUBLIC ${PROJECT_NAME})
     
     # Add the example.
-    add_executable(${PROJECT_NAME}_example_channels ${PROJECT_SOURCE_DIR}/examples/example_channels.cpp)
+    add_executable(${PROJECT_NAME}_example_registry ${PROJECT_SOURCE_DIR}/examples/example_registry.cpp)
     # Set the linked libraries.
-    target_link_libraries(${PROJECT_NAME}_example_channels PUBLIC ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_NAME})
     
 endif()
 

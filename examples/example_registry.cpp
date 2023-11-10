@@ -48,6 +48,16 @@ void function_3()
     qcritical(pvp, "there %d", 10);
 }
 
+
+void function_4()
+{
+    qdebug(quire::registry["pvp"], "there %d", 10);
+    qinfo(quire::registry["pvp"], "there %d", 10);
+    qwarning(quire::registry["pvp"], "there %d", 10);
+    qerror(quire::registry["pvp"], "there %d", 10);
+    qcritical(quire::registry["pvp"], "there %d", 10);
+}
+
 int main(int, char *[])
 {
     quire::registry_t::value_t pve = quire::registry.create("pve", "pve", quire::log_level::debug, '|');
@@ -69,6 +79,8 @@ int main(int, char *[])
     qcritical(pvp, "This is a critical message!");
 
     pvp->log(quire::critical, "This is a critical message!");
+    
+    function_4();
 
     return 0;
 }

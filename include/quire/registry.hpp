@@ -53,7 +53,10 @@ public:
     const value_t operator[](key_t key) const;
 
 private:
+    /// @brief Maps loggers name and their instance.
     map_t m_map;
+    /// @brief A mutex to protect the use of the logger.
+    std::mutex mtx;
 };
 
 extern registry_t registry;

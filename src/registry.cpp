@@ -3,6 +3,7 @@
 /// @brief
 
 #include "quire/registry.hpp"
+#include <mutex>
 
 namespace quire
 {
@@ -19,6 +20,7 @@ bool registry_t::empty() const
 
 registry_t::value_t registry_t::create(key_t key, std::string _header, log_level _min_level, char _separator)
 {
+    std::lock_guard<std::mutex> lock(mtx);
     // Check if the logger already exists.
     iterator it = m_map.find(key);
     if (it != m_map.end()) {
@@ -35,6 +37,7 @@ registry_t::value_t registry_t::create(key_t key, std::string _header, log_level
 
 registry_t::value_t registry_t::remove(key_t key)
 {
+    std::lock_guard<std::mutex> lock(mtx);
     // Check if the logger exists.
     iterator it = m_map.find(key);
     if (it == m_map.end()) {
@@ -47,6 +50,7 @@ registry_t::value_t registry_t::remove(key_t key)
 
 void registry_t::clear()
 {
+    std::lock_guard<std::mutex> lock(mtx);
     m_map.clear();
 }
 

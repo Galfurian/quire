@@ -63,11 +63,11 @@ extern const char *prevline;  ///< Move cursor to beginning of line, 1 line up.
 
 /// @brief Defines the log levels.
 enum log_level {
-    debug    = 10, ///< Debug level.
-    info     = 20, ///< Info level.
-    warning  = 30, ///< Warning level.
-    error    = 40, ///< Error level.
-    critical = 50  ///< Critical level.
+    debug    = 0, ///< Debug level.
+    info     = 1, ///< Info level.
+    warning  = 2, ///< Warning level.
+    error    = 3, ///< Error level.
+    critical = 4  ///< Critical level.
 };
 
 /// @brief Configuration bitmasks.
@@ -123,6 +123,10 @@ private:
     char *buffer;
     /// @brief The current size of the buffer.
     std::size_t buffer_length;
+    /// @brief Keeps track of the association between log level and foreground color.
+    const char *fg_colors[5];
+    /// @brief Keeps track of the association between log level and background color.
+    const char *bg_colors[5];
 
 public:
     /// @brief Construct a new logger.
@@ -144,6 +148,12 @@ public:
 
     /// @brief Sets the separator.
     void set_separator(char _separator);
+
+    /// @brief Sets the color for a given log level.
+    /// @param level the level we want to customize.
+    /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
+    /// @param bg the background color we want to use (default: quire::ansi::util::reset).
+    void set_color(log_level level, const char *fg, const char *bg);
 
     /// @brief Turns on/off the level.
     void configure(int _config);

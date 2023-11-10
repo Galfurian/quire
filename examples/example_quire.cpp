@@ -49,6 +49,8 @@ int main(int, char *[])
     l0->set_header("");
     qinfo(l0, "%2d", 10);
 
+    l0->set_color(quire::info, quire::ansi::fg::bright_magenta, quire::ansi::bg::white);
+
     l0->set_header("L0");
     l0->log(quire::info, "%2d", 10);
 
