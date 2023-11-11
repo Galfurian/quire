@@ -48,9 +48,7 @@ find_package(Doxygen)
 # -----------------------------------------------------------------------------
 
 # Add the C++ Library.
-add_library(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/src/quire.cpp
-    ${PROJECT_SOURCE_DIR}/src/registry.cpp)
+add_library(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/quire.cpp)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Include header directories, and link libraries.
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)

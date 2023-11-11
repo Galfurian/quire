@@ -187,6 +187,11 @@ void logger_t::set_separator(char _separator)
     separator = _separator;
 }
 
+std::string logger_t::get_header() const
+{
+    return header;
+}
+
 void logger_t::set_color(log_level level, const char *fg, const char *bg)
 {
     if ((level >= debug) && (level <= critical)) {
