@@ -2,6 +2,8 @@
 /// @author Enrico Fraccaroli (enry.frak@gmail.com)
 /// @brief
 
+#pragma once
+
 #include <exception>
 #include <map>
 #include <stdexcept>
