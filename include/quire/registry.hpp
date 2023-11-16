@@ -52,7 +52,7 @@ public:
     }
 
     /// @brief Returns a copy of the loggers map.
-    const map_t &loggers() const
+    inline const map_t &loggers() const
     {
         return m_map;
     }
@@ -63,7 +63,7 @@ public:
     /// @param _min_level the minimal level we will print for this logger.
     /// @param _separator the semparator used for dividing all the log information.
     /// @return value_t the newly created logger.
-    value_t create(key_t key, std::string _header, log_level _min_level, char _separator)
+    inline value_t create(key_t key, std::string _header, log_level _min_level, char _separator)
     {
         std::lock_guard<std::mutex> lock(mtx);
         // Check if the logger already exists.
@@ -87,7 +87,7 @@ public:
     /// @brief Removes the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a copy of the logger.
-    value_t remove(key_t key)
+    inline value_t remove(key_t key)
     {
         std::lock_guard<std::mutex> lock(mtx);
         // Check if the logger exists.
@@ -103,7 +103,7 @@ public:
     }
 
     /// @brief Clears the map from all the loggers.
-    void clear()
+    inline void clear()
     {
         std::lock_guard<std::mutex> lock(mtx);
         m_map.clear();
@@ -112,7 +112,7 @@ public:
     /// @brief Checks if the registry contains the given logger.
     /// @param key the key associated with the logger.
     /// @return true if the logger exists, false otherwise.
-    bool contains(key_t key) const
+    inline bool contains(key_t key) const
     {
         const_iterator it = m_map.find(key);
         return it != m_map.end();
@@ -121,7 +121,7 @@ public:
     /// @brief Returns the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a reference to the logger.
-    const value_t get(key_t key) const
+    inline const value_t get(key_t key) const
     {
         // Check if the logger exists.
         const_iterator it = m_map.find(key);
@@ -136,7 +136,7 @@ public:
     /// @brief Returns the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a reference to the logger.
-    value_t get(key_t key)
+    inline value_t get(key_t key)
     {
         // Check if the logger exists.
         iterator it = m_map.find(key);
@@ -151,7 +151,7 @@ public:
     /// @brief Returns the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a reference to the logger.
-    value_t operator[](key_t key)
+    inline value_t operator[](key_t key)
     {
         // Check if the logger exists.
         iterator it = m_map.find(key);
@@ -166,7 +166,7 @@ public:
     /// @brief Returns the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a reference to the logger.
-    const value_t operator[](key_t key) const
+    inline const value_t operator[](key_t key) const
     {
         // Check if the logger exists.
         const_iterator it = m_map.find(key);
@@ -178,27 +178,27 @@ public:
         return it->second;
     }
 
-    iterator begin() noexcept
+    inline iterator begin() noexcept
     {
         return m_map.begin();
     }
 
-    const_iterator begin() const noexcept
+    inline const_iterator begin() const noexcept
     {
         return m_map.begin();
     }
 
-    iterator end() noexcept
+    inline iterator end() noexcept
     {
         return m_map.end();
     }
 
-    const_iterator end() const noexcept
+    inline const_iterator end() const noexcept
     {
         return m_map.end();
     }
 
-    void adjust_header_length()
+    inline void adjust_header_length()
     {
         const_iterator cit;
         std::string::size_type max_length = 0;
@@ -214,7 +214,7 @@ public:
     }
 
     /// @brief Gets a singleton reference to the registry.
-    static registry_t &instance()
+    inline static registry_t &instance()
     {
         static registry_t registry;
         return registry;
@@ -253,7 +253,7 @@ private:
 /// @param key the key associated with the logger.
 /// @return a reference to the logger.
 template <typename K>
-typename registry_t<K>::value_t get_logger(typename registry_t<K>::key_t key)
+inline typename registry_t<K>::value_t get_logger(typename registry_t<K>::key_t key)
 {
     return registry_t<K>::instance().get(key);
 }
@@ -265,7 +265,7 @@ typename registry_t<K>::value_t get_logger(typename registry_t<K>::key_t key)
 /// @param _separator the semparator used for dividing all the log information.
 /// @return value_t the newly created logger.
 template <typename K>
-typename registry_t<K>::value_t create_logger(
+inline typename registry_t<K>::value_t create_logger(
     typename registry_t<K>::key_t key,
     std::string _header,
     quire::log_level _min_level,
@@ -281,7 +281,7 @@ typename registry_t<K>::value_t create_logger(
 /// @param key the key associated with the logger.
 /// @return a copy of the logger.
 template <typename K>
-typename registry_t<K>::value_t remove_logger(typename registry_t<K>::key_t key)
+inline typename registry_t<K>::value_t remove_logger(typename registry_t<K>::key_t key)
 {
     registry_t<K> &registry                = registry_t<K>::instance();
     typename registry_t<K>::value_t logger = registry.remove(key);
@@ -291,7 +291,7 @@ typename registry_t<K>::value_t remove_logger(typename registry_t<K>::key_t key)
 
 /// @brief Returns a copy of the loggers map.
 template <typename K>
-const typename registry_t<K>::map_t &get_loggers()
+inline const typename registry_t<K>::map_t &get_loggers()
 {
     return registry_t<K>::instance().loggers();
 }
