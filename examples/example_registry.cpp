@@ -7,78 +7,86 @@
 
 #include <iostream>
 
-void function_1()
+enum channel_t {
+    local,
+    global,
+    admin
+};
+
+using RegistryString = quire::registry_t<std::string>;
+using RegistryInt    = quire::registry_t<int>;
+using RegistryEnum   = quire::registry_t<channel_t>;
+
+void registry_string()
 {
-    quire::registry_t::value_t pve = quire::get_logger("pve");
-    qdebug(pve, "Hello %d", 10);
-    qinfo(pve, "Hello %d", 10);
-    qwarning(pve, "Hello %d", 10);
-    qerror(pve, "Hello %d", 10);
-    qcritical(pve, "Hello %d", 10);
+    RegistryString::value_t logger = quire::get_logger<std::string>("rs");
+    qdebug(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qinfo(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qwarning(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qerror(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qcritical(logger, "Hello %s, the temperature is %d.", "friend", 10);
 }
 
-void function_2()
+void registry_int()
 {
-    quire::registry_t::value_t pve = quire::get_logger("pve");
-    qdebug(pve, "there %d", 10);
-    qinfo(pve, "there %d", 10);
-    qwarning(pve, "there %d", 10);
-    qerror(pve, "there %d", 10);
-    qcritical(pve, "there %d", 10);
+    RegistryInt::value_t logger = quire::get_logger<int>(0);
+    qdebug(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qinfo(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qwarning(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qerror(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qcritical(logger, "Hello %s, the temperature is %d.", "friend", 10);
 }
 
-void function_3()
+void registry_enum()
 {
-    quire::registry_t::value_t pvp;
+    RegistryEnum::value_t log_local = quire::get_logger<channel_t>(local);
+    qdebug(log_local, "Hello %s, this is the local channel, the temperature is %d.", "friend", 10);
+    RegistryEnum::value_t log_global = quire::get_logger<channel_t>(global);
+    qdebug(log_global, "Hello %s, this is the global channel, the temperature is %d.", "friend", 10);
+    RegistryEnum::value_t log_admin = quire::get_logger<channel_t>(admin);
+    qdebug(log_admin, "Hello %s, this is the admin channel, the temperature is %d.", "friend", 10);
+}
+
+void registry_create()
+{
+    RegistryInt::value_t logger;
     try {
-        pvp = quire::get_logger("pvp");
+        logger = quire::get_logger<int>(1);
     } catch (quire::registry_exception_t const &) {
         try {
-            pvp = quire::create_logger("pvp", "pvp", quire::log_level::debug, '|');
+            logger = quire::create_logger<int>(1, "RegistryInt(1)", quire::log_level::debug, '|');
         } catch (quire::registry_exception_t const &) {
             std::cout << "Failed to create logger.\n";
             std::exit(1);
         }
     }
-    qdebug(pvp, "there %d", 10);
-    qinfo(pvp, "there %d", 10);
-    qwarning(pvp, "there %d", 10);
-    qerror(pvp, "there %d", 10);
-    qcritical(pvp, "there %d", 10);
-}
-
-void function_4()
-{
-    qdebug(quire::get_logger("pvp"), "there %d", 10);
-    qinfo(quire::get_logger("pvp"), "there %d", 10);
-    qwarning(quire::get_logger("pvp"), "there %d", 10);
-    qerror(quire::get_logger("pvp"), "there %d", 10);
-    qcritical(quire::get_logger("pvp"), "there %d", 10);
+    logger->configure(quire::show_all);
+    qdebug(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qinfo(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qwarning(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qerror(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qcritical(logger, "Hello %s, the temperature is %d.", "friend", 10);
 }
 
 int main(int, char *[])
 {
-    quire::registry_t::value_t pve = quire::create_logger("pve", "pve", quire::log_level::debug, '|');
+    RegistryString::value_t rs = quire::create_logger<std::string>("rs", "RegistryString", quire::log_level::debug, '|');
+    rs->configure(quire::show_all);
+    registry_string();
+    rs->configure(quire::show_nothing);
+    registry_string();
 
-    pve->configure(quire::show_all);
+    RegistryInt::value_t ri = quire::create_logger<int>(0, "RegistryInt(0)", quire::log_level::debug, '|');
+    ri->configure(quire::show_all);
+    registry_int();
+    ri->configure(quire::show_nothing);
+    registry_int();
 
-    function_1();
+    registry_create();
 
-    pve->configure(quire::show_nothing);
-
-    function_2();
-
-    function_3();
-
-    quire::registry_t::value_t pvp = quire::get_logger("pvp");
-
-    pvp->configure(quire::show_all);
-
-    qcritical(pvp, "This is a critical message!");
-
-    pvp->log(quire::critical, "This is a critical message!");
-
-    function_4();
-
+    quire::create_logger<channel_t>(local, "local", quire::log_level::debug, '|')->configure(quire::show_all);
+    quire::create_logger<channel_t>(global, "global", quire::log_level::debug, '|')->configure(quire::show_all);
+    quire::create_logger<channel_t>(admin, "admin", quire::log_level::debug, '|')->configure(quire::show_all);
+    registry_enum();
     return 0;
 }

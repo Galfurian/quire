@@ -157,6 +157,9 @@ public:
     /// @brief Sets the separator.
     void set_separator(char _separator);
 
+    /// @brief Retuns the header.
+    std::string get_header() const;
+
     /// @brief Sets the color for a given log level.
     /// @param level the level we want to customize.
     /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
