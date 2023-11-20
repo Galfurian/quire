@@ -5,6 +5,7 @@
 #include "quire/quire.hpp"
 
 #include <exception>
+#include <pylifecycle.h>
 #include <stdexcept>
 #include <cstdarg>
 #include <iomanip>
@@ -62,20 +63,29 @@ namespace ipython
 
 static PyObject *get_method(PyObject *module, const std::string &name)
 {
-    PyObject *method = PyObject_GetAttrString(module, name.c_str());
-    if (method == nullptr) {
-        PyErr_SetString(PyExc_SystemError, ("Cannot find '" + name + "' function in logging module.").c_str());
-        return nullptr;
+    if (!Py_IsInitialized()) {
+        Py_Initialize();
     }
-    if (!PyCallable_Check(method)) {
-        PyErr_SetString(PyExc_TypeError, ("Function '" + name + "' is not callable.").c_str());
-        return nullptr;
+    PyObject *method = nullptr;
+    if (module) {
+        method = PyObject_GetAttrString(module, name.c_str());
+        if (method == nullptr) {
+            PyErr_SetString(PyExc_SystemError, ("Cannot find '" + name + "' function in logging module.").c_str());
+            return nullptr;
+        }
+        if (!PyCallable_Check(method)) {
+            PyErr_SetString(PyExc_TypeError, ("Function '" + name + "' is not callable.").c_str());
+            return nullptr;
+        }
     }
     return method;
 }
 
 static PyObject *get_logger(const std::string &name)
 {
+    if (!Py_IsInitialized()) {
+        Py_Initialize();
+    }
     PyObject *logging = nullptr, *getLogger = nullptr, *logger = nullptr;
     // Get the logging library.
     logging = PyImport_ImportModule("logging");
@@ -177,12 +187,12 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
       bg_colors()
 #ifdef PYTHON_INTERFACE_ENABLED
       ,
-      py_logger(ipython::get_logger(_header)),
-      py_debug(ipython::get_method(py_logger, "debug")),
-      py_info(ipython::get_method(py_logger, "info")),
-      py_warning(ipython::get_method(py_logger, "warning")),
-      py_error(ipython::get_method(py_logger, "error")),
-      py_critical(ipython::get_method(py_logger, "critical"))
+      py_logger(),
+      py_debug(),
+      py_info(),
+      py_warning(),
+      py_error(),
+      py_critical()
 #endif
 {
     // Default foreground colors.
@@ -197,6 +207,17 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
     bg_colors[warning]  = quire::ansi::util::reset;
     bg_colors[error]    = quire::ansi::util::reset;
     bg_colors[critical] = quire::ansi::util::reset;
+#ifdef PYTHON_INTERFACE_ENABLED
+    py_logger   = ipython::get_logger(_header);
+    py_debug    = ipython::get_method(py_logger, "debug");
+    py_info     = ipython::get_method(py_logger, "info");
+    py_warning  = ipython::get_method(py_logger, "warning");
+    py_error    = ipython::get_method(py_logger, "error");
+    py_critical = ipython::get_method(py_logger, "critical");
+    // if (py_logger){
+    //     py_logger
+    // }
+#endif
 }
 
 logger_t::~logger_t()
@@ -356,7 +377,10 @@ void logger_t::do_log(log_level level, const std::string &location) const
     if (_show_location && !location.empty()) {
         ss << location << " " << separator << " ";
     }
-    ss << buffer << "\n";
+    ss << buffer;
+#ifndef PYTHON_INTERFACE_ENABLED
+    ss << "\n";
+#endif
 
     // == WRITE TO FILE STREAM ================================================
     if (fhandler) {
@@ -394,15 +418,15 @@ void logger_t::do_log(log_level level, const std::string &location) const
         py_ss << ansi::util::reset;
     }
 
-    if (level == log_level::debug) {
+    if (level == log_level::debug && py_debug) {
         PyEval_CallObject(py_debug, Py_BuildValue("(s)", py_ss.str().c_str()));
-    } else if (level == log_level::info) {
+    } else if (level == log_level::info && py_info) {
         PyEval_CallObject(py_info, Py_BuildValue("(s)", py_ss.str().c_str()));
-    } else if (level == log_level::warning) {
+    } else if (level == log_level::warning && py_warning) {
         PyEval_CallObject(py_warning, Py_BuildValue("(s)", py_ss.str().c_str()));
-    } else if (level == log_level::error) {
+    } else if (level == log_level::error && py_error) {
         PyEval_CallObject(py_error, Py_BuildValue("(s)", py_ss.str().c_str()));
-    } else if (level == log_level::critical) {
+    } else if (level == log_level::critical && py_critical) {
         PyEval_CallObject(py_critical, Py_BuildValue("(s)", py_ss.str().c_str()));
     }
 
