@@ -6,19 +6,11 @@
 
 #include <exception>
 #include <stdexcept>
-
 #include <cstdarg>
-// #include <cstdio>
-// #include <cstdlib>
-// #include <cstring>
-// #include <exception>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
-// #include <memory>
-// #include <sstream>
-// #include <string>
 
 const char *quire::ansi::fg::black   = "\33[30m";
 const char *quire::ansi::fg::red     = "\33[31m";
@@ -62,6 +54,47 @@ const char *quire::ansi::util::prevline  = "\33[1F";
 
 namespace quire
 {
+
+#ifdef PYTHON_INTERFACE_ENABLED
+
+namespace ipython
+{
+
+static PyObject *get_method(PyObject *module, const std::string &name)
+{
+    PyObject *method = PyObject_GetAttrString(module, name.c_str());
+    if (method == nullptr) {
+        PyErr_SetString(PyExc_SystemError, ("Cannot find '" + name + "' function in logging module.").c_str());
+        return nullptr;
+    }
+    if (!PyCallable_Check(method)) {
+        PyErr_SetString(PyExc_TypeError, ("Function '" + name + "' is not callable.").c_str());
+        return nullptr;
+    }
+    return method;
+}
+
+static PyObject *get_logger(const std::string &name)
+{
+    PyObject *logging = nullptr, *getLogger = nullptr, *logger = nullptr;
+    // Get the logging library.
+    logging = PyImport_ImportModule("logging");
+    if (logging) {
+        // Get the getLogger function.
+        getLogger = ipython::get_method(logging, "getLogger");
+        if (getLogger) {
+            logger = PyEval_CallObject(getLogger, Py_BuildValue("(s)", name.c_str()));
+        }
+    }
+    if (!logger) {
+        PyErr_SetString(PyExc_TypeError, "Cannot create the logger for C++.");
+    }
+    return logger;
+}
+
+} // namespace ipython
+
+#endif
 
 /// @brief Get the current date.
 static inline std::string __get_date()
@@ -142,6 +175,15 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
       buffer_length(0),
       fg_colors(),
       bg_colors()
+#ifdef PYTHON_INTERFACE_ENABLED
+      ,
+      py_logger(ipython::get_logger(_header)),
+      py_debug(ipython::get_method(py_logger, "debug")),
+      py_info(ipython::get_method(py_logger, "info")),
+      py_warning(ipython::get_method(py_logger, "warning")),
+      py_error(ipython::get_method(py_logger, "error")),
+      py_critical(ipython::get_method(py_logger, "critical"))
+#endif
 {
     // Default foreground colors.
     fg_colors[debug]    = ansi::fg::cyan;
@@ -321,6 +363,8 @@ void logger_t::do_log(log_level level, const std::string &location) const
         fhandler->write(ss.str());
     }
 
+#ifndef PYTHON_INTERFACE_ENABLED
+
     if (stream) {
         // == COLOR (ON) ======================================================
         if (_show_colored && (level >= debug) && (level <= critical)) {
@@ -335,6 +379,34 @@ void logger_t::do_log(log_level level, const std::string &location) const
             (*stream) << ansi::util::reset;
         }
     }
+
+#else
+
+    std::stringstream py_ss;
+
+    // == COLOR (ON) ======================================================
+    if (_show_colored && (level >= debug) && (level <= critical)) {
+        py_ss << bg_colors[level] << fg_colors[level];
+    }
+    py_ss << ss.str();
+    // == COLOR (OFF) =====================================================
+    if (_show_colored) {
+        py_ss << ansi::util::reset;
+    }
+
+    if (level == log_level::debug) {
+        PyEval_CallObject(py_debug, Py_BuildValue("(s)", py_ss.str().c_str()));
+    } else if (level == log_level::info) {
+        PyEval_CallObject(py_info, Py_BuildValue("(s)", py_ss.str().c_str()));
+    } else if (level == log_level::warning) {
+        PyEval_CallObject(py_warning, Py_BuildValue("(s)", py_ss.str().c_str()));
+    } else if (level == log_level::error) {
+        PyEval_CallObject(py_error, Py_BuildValue("(s)", py_ss.str().c_str()));
+    } else if (level == log_level::critical) {
+        PyEval_CallObject(py_critical, Py_BuildValue("(s)", py_ss.str().c_str()));
+    }
+
+#endif
 }
 
 } // namespace quire

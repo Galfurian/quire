@@ -36,6 +36,7 @@ mark_as_advanced(FORCE
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(WARNINGS_AS_ERRORS "Treat all warnings as errors" OFF)
+option(BUILD_PYTHON_INTERFACE "Build the python interface" OFF)
 
 # -----------------------------------------------------------------------------
 # DEPENDENCY (SYSTEM LIBRARIES)
@@ -82,6 +83,22 @@ if(STRICT_WARNINGS)
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wextra -Wconversion -pedantic)
     endif()
+endif()
+
+# -----------------------------------------------------------------------------
+# PYTHON INTERFACE
+# -----------------------------------------------------------------------------
+
+if(BUILD_PYTHON_INTERFACE)
+
+    # Find python development library.
+    find_package(Python COMPONENTS Interpreter Development)
+    
+    # Add a macro inside the C++, so that we can de-activate the python wrapping code.
+    target_compile_definitions(${PROJECT_NAME} PUBLIC PYTHON_INTERFACE_ENABLED)
+
+    target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
+
 endif()
 
 # -----------------------------------------------------------------------------

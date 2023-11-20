@@ -7,6 +7,9 @@
 #include <fstream>
 #include <memory>
 #include <mutex>
+#ifdef PYTHON_INTERFACE_ENABLED
+#include <Python.h>
+#endif
 
 /// @brief Quire source code.
 namespace quire
@@ -132,6 +135,14 @@ private:
     const char *fg_colors[5];
     /// @brief Keeps track of the association between log level and background color.
     const char *bg_colors[5];
+#ifdef PYTHON_INTERFACE_ENABLED
+    PyObject *py_logger;
+    PyObject *py_debug;
+    PyObject *py_info;
+    PyObject *py_warning;
+    PyObject *py_error;
+    PyObject *py_critical;
+#endif
 
 public:
     /// @brief Construct a new logger.
@@ -193,6 +204,12 @@ public:
 private:
     void do_log(log_level level, const std::string &location) const;
 };
+
+#ifdef PYTHON_INTERFACE_ENABLED
+
+void initialize_python_interface();
+
+#endif
 
 } // namespace quire
 
