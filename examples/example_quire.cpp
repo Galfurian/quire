@@ -1,6 +1,6 @@
-/// @file simple.cpp
+/// @file example_quire.cpp
 /// @author Enrico Fraccaroli (enry.frak@gmail.com)
-/// @brief Simple example.
+/// @brief
 
 #include <quire/quire.hpp>
 

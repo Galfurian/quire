@@ -48,7 +48,10 @@ find_package(Doxygen)
 # -----------------------------------------------------------------------------
 
 # Add the C++ Library.
-add_library(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/quire.cpp)
+add_library(${PROJECT_NAME}
+    ${PROJECT_SOURCE_DIR}/src/quire.cpp
+    ${PROJECT_SOURCE_DIR}/src/registry.cpp
+)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Include header directories, and link libraries.
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
@@ -104,6 +107,11 @@ if(BUILD_EXAMPLES)
     add_executable(${PROJECT_NAME}_example_log_file ${PROJECT_SOURCE_DIR}/examples/example_log_file.cpp)
     # Set the linked libraries.
     target_link_libraries(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_NAME})
+    
+    # Add the example.
+    add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
+    # Set the linked libraries.
+    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME})
     
 endif()
 

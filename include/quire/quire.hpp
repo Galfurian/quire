@@ -109,7 +109,69 @@ public:
 
 /// @brief The logger class.
 class logger_t {
+public:
+    /// @brief Construct a new logger.
+    /// @param _header the header shown every time the log is printed.
+    /// @param _min_level the minimal level we will print for this logger.
+    /// @param _separator the semparator used for dividing all the log information.
+    explicit logger_t(std::string _header, log_level _min_level, char _separator);
+
+    ~logger_t();
+
+    /// @brief Retuns the header.
+    std::string get_header() const;
+
+    /// @brief Resets the color to the default ones.
+    logger_t &reset_colors();
+
+    /// @brief Sets the file handler.
+    logger_t &set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
+
+    /// @brief Sets the output stream.
+    logger_t &set_output_stream(std::ostream *_stream);
+
+    /// @brief Sets the header.
+    logger_t &set_header(std::string _header);
+
+    /// @brief Sets the log level.
+    logger_t &set_log_level(log_level _level);
+
+    /// @brief Sets the separator.
+    logger_t &set_separator(char _separator);
+
+    /// @brief Sets the color for a given log level.
+    /// @param level the level we want to customize.
+    /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
+    /// @param bg the background color we want to use (default: quire::ansi::util::reset).
+    logger_t &set_color(log_level level, const char *fg, const char *bg);
+
+    /// @brief Turns on/off the level.
+    logger_t &configure(int _config);
+
+    /// @brief Turns on/off the level.
+    logger_t &toggle_level(bool enable);
+
+    /// @brief Turns on/off the color.
+    logger_t &toggle_color(bool enable);
+
+    /// @brief Turns on/off the date.
+    logger_t &toggle_date(bool enable);
+
+    /// @brief Turns on/off the time.
+    logger_t &toggle_time(bool enable);
+
+    /// @brief Turns on/off the location inside the file.
+    logger_t &toggle_location(bool enable);
+
+    /// @brief Perform the logging.
+    void log(log_level level, char const *format, ...);
+
+    /// @brief Perform the logging.
+    void log(log_level level, char const *file, int line, char const *format, ...);
+
 private:
+    void do_log(log_level level, const std::string &location) const;
+
     /// @brief A pointer to the file handler.
     std::shared_ptr<file_handler_t> fhandler;
     /// @brief A pointer to the output stream.
@@ -132,66 +194,6 @@ private:
     const char *fg_colors[5];
     /// @brief Keeps track of the association between log level and background color.
     const char *bg_colors[5];
-
-public:
-    /// @brief Construct a new logger.
-    /// @param _header the header shown every time the log is printed.
-    /// @param _min_level the minimal level we will print for this logger.
-    /// @param _separator the semparator used for dividing all the log information.
-    explicit logger_t(std::string _header, log_level _min_level, char _separator);
-
-    ~logger_t();
-
-    /// @brief Sets the file handler.
-    void set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
-
-    /// @brief Sets the output stream.
-    void set_output_stream(std::ostream *_stream);
-
-    /// @brief Sets the header.
-    void set_header(std::string _header);
-
-    /// @brief Sets the log level.
-    void set_log_level(log_level _level);
-
-    /// @brief Sets the separator.
-    void set_separator(char _separator);
-
-    /// @brief Retuns the header.
-    std::string get_header() const;
-
-    /// @brief Sets the color for a given log level.
-    /// @param level the level we want to customize.
-    /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
-    /// @param bg the background color we want to use (default: quire::ansi::util::reset).
-    void set_color(log_level level, const char *fg, const char *bg);
-
-    /// @brief Turns on/off the level.
-    void configure(int _config);
-
-    /// @brief Turns on/off the level.
-    void toggle_level(bool enable);
-
-    /// @brief Turns on/off the color.
-    void toggle_color(bool enable);
-
-    /// @brief Turns on/off the date.
-    void toggle_date(bool enable);
-
-    /// @brief Turns on/off the time.
-    void toggle_time(bool enable);
-
-    /// @brief Turns on/off the location inside the file.
-    void toggle_location(bool enable);
-
-    /// @brief Perform the logging.
-    void log(log_level level, char const *format, ...);
-
-    /// @brief Perform the logging.
-    void log(log_level level, char const *file, int line, char const *format, ...);
-
-private:
-    void do_log(log_level level, const std::string &location) const;
 };
 
 } // namespace quire
