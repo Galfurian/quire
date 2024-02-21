@@ -6,11 +6,8 @@
 
 int main(int, char *[])
 {
-    auto l0 = std::make_shared<quire::logger_t>("L0", quire::log_level::debug, '|');
-    auto l1 = std::make_shared<quire::logger_t>("L1", quire::log_level::debug, '|');
+    auto l0 = std::make_shared<quire::logger_t>("l0", quire::log_level::debug, '|');
 
-    l0->set_header("L0");
-    l0->set_log_level(quire::log_level::debug);
     l0->toggle_color(true);
     l0->toggle_level(true);
     l0->toggle_date(true);

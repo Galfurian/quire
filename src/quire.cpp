@@ -148,7 +148,7 @@ std::string logger_t::get_header() const
     return header;
 }
 
-logger_t &logger_t::reset_colors()
+void logger_t::reset_colors()
 {
     // Default foreground colors.
     fg_colors[debug]    = ansi::fg::cyan;
@@ -162,82 +162,69 @@ logger_t &logger_t::reset_colors()
     bg_colors[warning]  = quire::ansi::util::reset;
     bg_colors[error]    = quire::ansi::util::reset;
     bg_colors[critical] = quire::ansi::util::reset;
-    return *this;
 }
 
-logger_t &logger_t::set_file_handler(std::shared_ptr<file_handler_t> _fhandler)
+void logger_t::set_file_handler(std::shared_ptr<file_handler_t> _fhandler)
 {
     fhandler = _fhandler;
-    return *this;
 }
 
-logger_t &logger_t::set_output_stream(std::ostream *_stream)
+void logger_t::set_output_stream(std::ostream *_stream)
 {
     stream = _stream;
-    return *this;
 }
 
-logger_t &logger_t::set_header(std::string _header)
+void logger_t::set_header(std::string _header)
 {
     header = _header;
-    return *this;
 }
 
-logger_t &logger_t::set_log_level(log_level _level)
+void logger_t::set_log_level(log_level _level)
 {
     min_level = _level;
-    return *this;
 }
 
-logger_t &logger_t::set_separator(char _separator)
+void logger_t::set_separator(char _separator)
 {
     separator = _separator;
-    return *this;
 }
 
-logger_t &logger_t::set_color(log_level level, const char *fg, const char *bg)
+void logger_t::set_color(log_level level, const char *fg, const char *bg)
 {
     if ((level >= debug) && (level <= critical)) {
         fg_colors[level] = fg;
         bg_colors[level] = bg;
     }
-    return *this;
 }
 
-logger_t &logger_t::configure(int _config)
+void logger_t::configure(int _config)
 {
     config = _config;
-    return *this;
 }
 
-logger_t &logger_t::toggle_level(bool enable)
+void logger_t::toggle_level(bool enable)
 {
     (enable) ? (config |= show_level) : (config &= ~show_level);
-    return *this;
 }
 
-logger_t &logger_t::toggle_color(bool enable)
+void logger_t::toggle_color(bool enable)
 {
     (enable) ? (config |= show_colored) : (config &= ~show_colored);
-    return *this;
 }
 
-logger_t &logger_t::toggle_date(bool enable)
+void logger_t::toggle_date(bool enable)
 {
     (enable) ? (config |= show_date) : (config &= ~show_date);
-    return *this;
 }
 
-logger_t &logger_t::toggle_time(bool enable)
+void logger_t::toggle_time(bool enable)
 {
     (enable) ? (config |= show_time) : (config &= ~show_time);
-    return *this;
 }
 
-logger_t &logger_t::toggle_location(bool enable)
+void logger_t::toggle_location(bool enable)
 {
     (enable) ? (config |= show_location) : (config &= ~show_location);
-    return *this;
 }
 
 void logger_t::log(log_level level, char const *format, ...)
