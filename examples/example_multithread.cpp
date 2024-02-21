@@ -47,15 +47,18 @@ void consumer_fun()
 
 int main(int, char *[])
 {
-    quire::create_logger(channel_local, "local", quire::log_level::debug, '|')
-        ->configure(quire::show_all)
-        .set_color(quire::debug, quire::ansi::fg::bright_cyan, quire::ansi::util::reset);
-    quire::create_logger(channel_global, "global", quire::log_level::debug, '|')
-        ->configure(quire::show_all)
-        .set_color(quire::debug, quire::ansi::fg::bright_yellow, quire::ansi::util::reset);
-    quire::create_logger(channel_admin, "admin", quire::log_level::debug, '|')
-        ->configure(quire::show_all)
-        .set_color(quire::debug, quire::ansi::fg::bright_red, quire::ansi::util::reset);
+    auto local  = quire::create_logger(channel_local, "local", quire::log_level::debug, '|');
+    auto global = quire::create_logger(channel_global, "global", quire::log_level::debug, '|');
+    auto admin  = quire::create_logger(channel_admin, "admin", quire::log_level::debug, '|');
+
+    local->configure(quire::show_all);
+    local->set_color(quire::debug, quire::ansi::fg::bright_cyan, quire::ansi::util::reset);
+
+    global->configure(quire::show_all);
+    global->set_color(quire::debug, quire::ansi::fg::bright_yellow, quire::ansi::util::reset);
+
+    admin->configure(quire::show_all);
+    admin->set_color(quire::debug, quire::ansi::fg::bright_red, quire::ansi::util::reset);
 
     std::thread producer(producer_fun);
     std::thread consumer(consumer_fun);

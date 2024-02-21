@@ -55,7 +55,7 @@ void registry_create()
 
 int main(int, char *[])
 {
-    quire::registry_t::value_t ri = quire::create_logger(0, "RegistryInt(0)", quire::log_level::debug, '|');
+    auto ri = quire::create_logger(0, "RegistryInt(0)", quire::log_level::debug, '|');
     ri->configure(quire::show_all);
     registry_int();
     ri->configure(quire::show_nothing);

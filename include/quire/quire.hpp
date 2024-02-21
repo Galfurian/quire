@@ -122,46 +122,46 @@ public:
     std::string get_header() const;
 
     /// @brief Resets the color to the default ones.
-    logger_t &reset_colors();
+    void reset_colors();
 
     /// @brief Sets the file handler.
-    logger_t &set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
+    void set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
 
     /// @brief Sets the output stream.
-    logger_t &set_output_stream(std::ostream *_stream);
+    void set_output_stream(std::ostream *_stream);
 
     /// @brief Sets the header.
-    logger_t &set_header(std::string _header);
+    void set_header(std::string _header);
 
     /// @brief Sets the log level.
-    logger_t &set_log_level(log_level _level);
+    void set_log_level(log_level _level);
 
     /// @brief Sets the separator.
-    logger_t &set_separator(char _separator);
+    void set_separator(char _separator);
 
     /// @brief Sets the color for a given log level.
     /// @param level the level we want to customize.
     /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
     /// @param bg the background color we want to use (default: quire::ansi::util::reset).
-    logger_t &set_color(log_level level, const char *fg, const char *bg);
+    void set_color(log_level level, const char *fg, const char *bg);
 
     /// @brief Turns on/off the level.
-    logger_t &configure(int _config);
+    void configure(int _config);
 
     /// @brief Turns on/off the level.
-    logger_t &toggle_level(bool enable);
+    void toggle_level(bool enable);
 
     /// @brief Turns on/off the color.
-    logger_t &toggle_color(bool enable);
+    void toggle_color(bool enable);
 
     /// @brief Turns on/off the date.
-    logger_t &toggle_date(bool enable);
+    void toggle_date(bool enable);
 
     /// @brief Turns on/off the time.
-    logger_t &toggle_time(bool enable);
+    void toggle_time(bool enable);
 
     /// @brief Turns on/off the location inside the file.
-    logger_t &toggle_location(bool enable);
+    void toggle_location(bool enable);
 
     /// @brief Perform the logging.
     void log(log_level level, char const *format, ...);

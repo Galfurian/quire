@@ -56,6 +56,12 @@ public:
     /// @return value_t the newly created logger.
     value_t create(key_t key, std::string _header, log_level _min_level, char _separator);
 
+    /// @brief Inserts an existing logger in the registry.
+    /// @param key the key associated with the logger.
+    /// @param logger the logger.
+    /// @return value_t the inserted logger.
+    value_t insert(key_t key, value_t logger);
+
     /// @brief Removes the logger associated with the given key.
     /// @param key the key associated with the logger.
     /// @return a copy of the logger.
@@ -155,8 +161,20 @@ inline registry_t::value_t create_logger(
     quire::log_level _min_level,
     char _separator)
 {
-    registry_t &registry                = registry_t::instance();
+    registry_t &registry       = registry_t::instance();
     registry_t::value_t logger = registry.create(key, _header, _min_level, _separator);
+    registry.adjust_header_length();
+    return logger;
+}
+
+/// @brief Inserts an existing logger in the registry.
+/// @param key the key associated with the logger.
+/// @param logger the logger.
+/// @return value_t the inserted logger.
+inline registry_t::value_t insert_logger(registry_t::key_t key, registry_t::value_t logger)
+{
+    registry_t &registry = registry_t::instance();
+    registry.insert(key, logger);
     registry.adjust_header_length();
     return logger;
 }
@@ -166,14 +184,14 @@ inline registry_t::value_t create_logger(
 /// @return a copy of the logger.
 inline registry_t::value_t remove_logger(registry_t::key_t key)
 {
-    registry_t &registry                = registry_t::instance();
+    registry_t &registry       = registry_t::instance();
     registry_t::value_t logger = registry.remove(key);
     registry.adjust_header_length();
     return logger;
 }
 
 /// @brief Returns a copy of the loggers map.
-inline const registry_t::map_t &get_loggers()
+inline const registry_t::map_t &loggers()
 {
     return registry_t::instance().loggers();
 }
