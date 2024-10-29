@@ -48,6 +48,25 @@ registry_t::value_t registry_t::create(key_t key, std::string _header, log_level
     return logger;
 }
 
+registry_t::value_t registry_t::insert(key_t key, value_t logger)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    // Check if the logger already exists.
+    iterator it = m_map.find(key);
+    if (it != m_map.end()) {
+        std::stringstream ss;
+        ss << "Logger `" << key << "` already exists.";
+        throw quire::registry_exception_t(ss.str());
+    }
+    // Insert the logger.
+    if (!m_map.insert(std::make_pair(key, logger)).second) {
+        std::stringstream ss;
+        ss << "Failed to create logger `" << key << "`.";
+        throw quire::registry_exception_t(ss.str());
+    }
+    return logger;
+}
+
 /// @brief Removes the logger associated with the given key.
 /// @param key the key associated with the logger.
 /// @return a copy of the logger.
@@ -176,6 +195,5 @@ void registry_t::adjust_header_length()
         cit->second->set_header(this->lalign(cit->second->get_header(), max_length, ' '));
     }
 }
-
 
 } // namespace quire
