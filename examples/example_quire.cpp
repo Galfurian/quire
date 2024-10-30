@@ -15,6 +15,9 @@ int main(int, char *[])
     l0->toggle_location(true);
 
     qdebug(l0, "Hello there!");
+    qdebug(l0, "");
+    qdebug(l0, "Empty");
+    qdebug(l0, "");
     l0->toggle_date(true);
     l0->toggle_time(false);
     qinfo(l0, "%2d", 10);

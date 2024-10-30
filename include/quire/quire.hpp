@@ -170,6 +170,12 @@ public:
     void log(log_level level, char const *file, int line, char const *format, ...);
 
 private:
+
+    /// @brief Helper function to handle formatting and buffer allocation.
+    /// @param format The format string for the message.
+    /// @param args The variable argument list for formatting.
+    void format_message(char const *format, va_list args);
+
     void do_log(log_level level, const std::string &location) const;
 
     /// @brief A pointer to the file handler.

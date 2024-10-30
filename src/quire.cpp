@@ -227,56 +227,67 @@ void logger_t::toggle_location(bool enable)
     (enable) ? (config |= show_location) : (config &= ~show_location);
 }
 
-void logger_t::log(log_level level, char const *format, ...)
+void logger_t::format_message(char const *format, va_list args)
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    if (level >= min_level) {
-        // == BUILD LOG =======================================================
-
+    if ((format == nullptr) || (format[0] == '\0')) {
+        // Clean the buffer by setting it to an empty string.
+        if (buffer != nullptr && buffer_length > 0) {
+            buffer[0] = '\0';
+        }
+    } else {
+        // Initialize variable argument lists to format the message.
         va_list length_args;
-        va_start(length_args, format);
-        va_list result_args;
-        va_copy(result_args, length_args);
+        va_copy(length_args, args);
+
+        // Calculate the length of the formatted string.
         const int length = std::vsnprintf(nullptr, 0U, format, length_args);
+        va_end(length_args);
+
         if (length > 0) {
+            // Check if the buffer needs to be resized.
             if (buffer_length < static_cast<std::size_t>(length) + 1) {
                 buffer_length = static_cast<std::size_t>(length) + 1;
                 buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
             }
-            std::vsnprintf(buffer, buffer_length, format, result_args);
+
+            // Format the message into the buffer.
+            std::vsnprintf(buffer, buffer_length, format, args);
         }
-        va_end(result_args);
-        va_end(length_args);
+    }
+}
 
-        // == LOGGING =========================================================
+void logger_t::log(log_level level, char const *format, ...)
+{
+    // Ensure thread safety by locking the mutex.
+    std::lock_guard<std::mutex> lock(mtx);
 
+    // Check if the current log level is greater than or equal to the minimum log level.
+    if (level >= min_level) {
+        // Format the message.
+        va_list args;
+        va_start(args, format);
+        format_message(format, args);
+        va_end(args);
+
+        // Call the actual logging implementation.
         this->do_log(level, std::string());
     }
 }
 
 void logger_t::log(log_level level, char const *file, int line, char const *format, ...)
 {
+    // Ensure thread safety by locking the mutex.
     std::lock_guard<std::mutex> lock(mtx);
+
+    // Check if the current log level is greater than or equal to the minimum log level.
     if (level >= min_level) {
-        // == BUILD LOG =======================================================
+        // Format the message.
+        va_list args;
+        va_start(args, format);
+        format_message(format, args);
+        va_end(args);
 
-        va_list length_args;
-        va_start(length_args, format);
-        va_list result_args;
-        va_copy(result_args, length_args);
-        const int length = std::vsnprintf(nullptr, 0U, format, length_args);
-        if (length > 0) {
-            if (buffer_length < static_cast<std::size_t>(length) + 1) {
-                buffer_length = static_cast<std::size_t>(length) + 1;
-                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
-            }
-            std::vsnprintf(buffer, buffer_length, format, result_args);
-        }
-        va_end(result_args);
-        va_end(length_args);
-
-        // == LOGGING =========================================================
-
+        // Call the actual logging implementation.
         this->do_log(level, __assemble_location(file, line));
     }
 }
@@ -311,7 +322,11 @@ void logger_t::do_log(log_level level, const std::string &location) const
     if (_show_location && !location.empty()) {
         ss << location << " " << separator << " ";
     }
-    ss << buffer << "\n";
+    // Check that the buffer is not empty.
+    if ((buffer != NULL) && (buffer[0] != '\0')) {
+        ss << buffer;
+    }
+    ss << "\n";
 
     // == WRITE TO FILE STREAM ================================================
     if (fhandler) {
