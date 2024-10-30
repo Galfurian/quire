@@ -111,7 +111,7 @@ if(BUILD_EXAMPLES)
     # Add the example.
     add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
     # Set the linked libraries.
-    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} pthread)
     
 endif()
 
