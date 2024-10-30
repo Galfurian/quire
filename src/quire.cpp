@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include <string>
 
 const char *quire::ansi::fg::black   = "\33[30m";
@@ -128,6 +129,7 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
       mtx(),
       header(_header),
       min_level(_min_level),
+      last_log_ended_with_newline(true),
       config(0),
       separator(_separator),
       buffer(nullptr),
@@ -269,8 +271,27 @@ void logger_t::log(log_level level, char const *format, ...)
         format_message(format, args);
         va_end(args);
 
-        // Call the actual logging implementation.
-        this->do_log(level, std::string());
+        // The source location where the log is generated.
+        const std::string location;
+
+        // Process the buffer directly without copying to std::string.
+        const char *start   = buffer;
+        const char *newline = nullptr;
+
+        // Split the buffer by lines and call do_log for each line
+        while ((newline = std::strchr(start, '\n')) != nullptr) {
+            // Create a string view-like object.
+            std::string line(start, newline - start + 1);
+            // Execute the log.
+            this->do_log(level, location, line.c_str());
+            // Move to the next line.
+            start = newline + 1;
+        }
+
+        // Log any remaining content after the last newline.
+        if (*start != '\0') {
+            this->do_log(level, location, start);
+        }
     }
 }
 
@@ -287,12 +308,31 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
         format_message(format, args);
         va_end(args);
 
-        // Call the actual logging implementation.
-        this->do_log(level, __assemble_location(file, line));
+        // The source location where the log is generated.
+        std::string location = __assemble_location(file, line);
+
+        // Process the buffer directly without copying to std::string.
+        const char *start   = buffer;
+        const char *newline = nullptr;
+
+        // Split the buffer by lines and call do_log for each line
+        while ((newline = std::strchr(start, '\n')) != nullptr) {
+            // Create a string view-like object.
+            std::string line(start, newline - start + 1);
+            // Execute the log.
+            this->do_log(level, location, line.c_str());
+            // Move to the next line.
+            start = newline + 1;
+        }
+
+        // Log any remaining content after the last newline.
+        if (*start != '\0') {
+            this->do_log(level, location, start);
+        }
     }
 }
 
-void logger_t::do_log(log_level level, const std::string &location) const
+void logger_t::do_log(log_level level, const std::string &location, const char *line) const
 {
     std::stringstream ss;
 
@@ -304,29 +344,36 @@ void logger_t::do_log(log_level level, const std::string &location) const
     bool _show_location = (config & show_location) == show_location;
 
     // == LOG INFORMATION =====================================================
-    if (!header.empty()) {
-        ss << header << " " << separator << " ";
-    }
-    if (_show_level) {
-        ss << std::left << std::setw(9) << __log_level_to_string(level) << separator << " ";
-    }
-    if (_show_date) {
-        ss << __get_date() << " ";
-        if (!_show_time) {
-            ss << separator << " ";
+    // Add the header only if the previous log ended with a newline
+    if (last_log_ended_with_newline) {
+        if (!header.empty()) {
+            ss << header << " " << separator << " ";
+        }
+        if (_show_level) {
+            ss << std::left << std::setw(9) << __log_level_to_string(level) << separator << " ";
+        }
+        if (_show_date) {
+            ss << __get_date() << " ";
+            if (!_show_time) {
+                ss << separator << " ";
+            }
+        }
+        if (_show_time) {
+            ss << __get_time() << " " << separator << " ";
+        }
+        if (_show_location && !location.empty()) {
+            ss << location << " " << separator << " ";
         }
     }
-    if (_show_time) {
-        ss << __get_time() << " " << separator << " ";
+
+    // Check that the line is not empty.
+    if ((line != NULL) && (line[0] != '\0')) {
+        // Write the actual log message.
+        ss << line;
+
+        // Update the newline flag based on the current message
+        last_log_ended_with_newline = (line[strlen(line) - 1] == '\n');
     }
-    if (_show_location && !location.empty()) {
-        ss << location << " " << separator << " ";
-    }
-    // Check that the buffer is not empty.
-    if ((buffer != NULL) && (buffer[0] != '\0')) {
-        ss << buffer;
-    }
-    ss << "\n";
 
     // == WRITE TO FILE STREAM ================================================
     if (fhandler) {

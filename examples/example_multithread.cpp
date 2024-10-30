@@ -33,7 +33,7 @@ void producer_fun()
     product.a     = 2;
     product.b     = 3;
     product.ready = true;
-    qdebug(local, "a = %d, b = %d", product.a, product.b);
+    qdebug(local, "a = %d, b = %d\n", product.a, product.b);
     condition.notify_one();
 }
 
@@ -42,7 +42,7 @@ void consumer_fun()
     std::unique_lock<std::mutex> lock(mtx);
     auto global = quire::get_logger(channel_global);
     condition.wait(lock, [&]() { return product.ready; });
-    qdebug(global, "%d * %d = %d", product.a, product.b, product.a * product.b);
+    qdebug(global, "%d * %d = %d\n", product.a, product.b, product.a * product.b);
 }
 
 int main(int, char *[])

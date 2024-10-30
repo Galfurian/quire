@@ -15,21 +15,21 @@ enum channel_t {
 void registry_int()
 {
     auto logger = quire::get_logger(0);
-    qdebug(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qinfo(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qwarning(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qerror(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qcritical(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qdebug(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qinfo(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qwarning(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qerror(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qcritical(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
 }
 
 void registry_enum()
 {
     auto log_local = quire::get_logger(local);
-    qdebug(log_local, "Hello %s, this is the local channel, the temperature is %d.", "friend", 10);
+    qdebug(log_local, "Hello %s, this is the local channel, the temperature is %d.\n", "friend", 10);
     auto log_global = quire::get_logger(global);
-    qdebug(log_global, "Hello %s, this is the global channel, the temperature is %d.", "friend", 10);
+    qdebug(log_global, "Hello %s, this is the global channel, the temperature is %d.\n", "friend", 10);
     auto log_admin = quire::get_logger(admin);
-    qdebug(log_admin, "Hello %s, this is the admin channel, the temperature is %d.", "friend", 10);
+    qdebug(log_admin, "Hello %s, this is the admin channel, the temperature is %d.\n", "friend", 10);
 }
 
 void registry_create()
@@ -46,11 +46,11 @@ void registry_create()
         }
     }
     logger->configure(quire::show_all);
-    qdebug(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qinfo(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qwarning(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qerror(logger, "Hello %s, the temperature is %d.", "friend", 10);
-    qcritical(logger, "Hello %s, the temperature is %d.", "friend", 10);
+    qdebug(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qinfo(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qwarning(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qerror(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
+    qcritical(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
 }
 
 int main(int, char *[])

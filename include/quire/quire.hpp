@@ -170,13 +170,16 @@ public:
     void log(log_level level, char const *file, int line, char const *format, ...);
 
 private:
-
     /// @brief Helper function to handle formatting and buffer allocation.
     /// @param format The format string for the message.
     /// @param args The variable argument list for formatting.
     void format_message(char const *format, va_list args);
 
-    void do_log(log_level level, const std::string &location) const;
+    /// @brief Logs information with specified log level and location to the stream or file.
+    /// @param level The log level to log (e.g., info, warning, error).
+    /// @param location The source location where the log is generated.
+    /// @param line The buffer containing the log message to be logged.
+    void do_log(log_level level, const std::string &location, const char *line) const;
 
     /// @brief A pointer to the file handler.
     std::shared_ptr<file_handler_t> fhandler;
@@ -188,6 +191,8 @@ private:
     std::string header;
     /// @brief The minimum level we are going to log.
     log_level min_level;
+    // Class member to track if the last log ended with a newline
+    mutable bool last_log_ended_with_newline;
     /// @brief Internal configuration of the logger.
     int config;
     /// @brief The character we use to separate elements of the log.

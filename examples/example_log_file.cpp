@@ -26,7 +26,7 @@ int main(int, char *[])
 
     std::cout << "We are saving the log to `" << log_filename << "`.\n";
 
-    qdebug(l0, "Hello there, I'm logging on file!");
+    qdebug(l0, "Hello there, I'm logging on file!\n");
 
     return 0;
 }
