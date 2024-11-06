@@ -150,6 +150,11 @@ std::string logger_t::get_header() const
     return header;
 }
 
+log_level logger_t::get_log_level() const
+{
+    return min_level;
+}
+
 void logger_t::reset_colors()
 {
     // Default foreground colors.

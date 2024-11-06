@@ -120,6 +120,9 @@ public:
 
     /// @brief Retuns the header.
     std::string get_header() const;
+    
+    /// @brief Returns the current log level.
+    log_level get_log_level() const;
 
     /// @brief Resets the color to the default ones.
     void reset_colors();
