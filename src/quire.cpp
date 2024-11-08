@@ -253,8 +253,18 @@ void logger_t::format_message(char const *format, va_list args)
         if (length > 0) {
             // Check if the buffer needs to be resized.
             if (buffer_length < static_cast<std::size_t>(length) + 1) {
-                buffer_length = static_cast<std::size_t>(length) + 1;
-                buffer        = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
+                // Double the buffer length until it can hold the formatted string.
+                while (buffer_length < static_cast<std::size_t>(length) + 1) {
+                    buffer_length = buffer_length == 0 ? 128 : buffer_length * 2;
+                }
+
+                char *new_buffer = reinterpret_cast<char *>(std::realloc(buffer, buffer_length));
+                if (new_buffer == nullptr) {
+                    // Handle memory allocation failure.
+                    perror("Failed to allocate memory for buffer resizing.");
+                    exit(EXIT_FAILURE);
+                }
+                buffer = new_buffer;
             }
 
             // Format the message into the buffer.
