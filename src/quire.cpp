@@ -276,7 +276,7 @@ void logger_t::log(log_level level, char const *format, ...)
         va_end(args);
 
         // Pass the level, location, and buffer to do_log.
-        this->do_log(level, std::string(), buffer);
+        this->write_log(level, std::string(), buffer);
     }
 }
 
@@ -293,22 +293,22 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
         va_end(args);
 
         // Pass the level, location, and buffer to do_log.
-        this->do_log(level, __assemble_location(file, line), buffer);
+        this->write_log(level, __assemble_location(file, line), buffer);
     }
 }
 
-void logger_t::do_log(log_level level, const std::string &location, const char *buffer) const
+void logger_t::write_log(log_level level, const std::string &location, const char *content) const
 {
-    const char *start   = buffer;
+    const char *start   = content;
     const char *newline = nullptr;
 
-    // Split the buffer by lines and log each line individually.
+    // Split the content by lines and log each line individually.
     while ((newline = std::strchr(start, '\n')) != nullptr) {
         // Calculate the length of the line.
         std::size_t line_length = static_cast<std::size_t>(newline - start + 1);
 
         // Log the line with the current location.
-        this->write_log(level, location, start, line_length);
+        this->write_log_line(level, location, start, line_length);
 
         // Move to the next line.
         start = newline + 1;
@@ -316,11 +316,11 @@ void logger_t::do_log(log_level level, const std::string &location, const char *
 
     // Log any remaining content after the last newline.
     if (*start != '\0') {
-        this->write_log(level, location, start, std::strlen(start));
+        this->write_log_line(level, location, start, std::strlen(start));
     }
 }
 
-void logger_t::write_log(log_level level, const std::string &location, const char *line, std::size_t length) const
+void logger_t::write_log_line(log_level level, const std::string &location, const char *line, std::size_t length) const
 {
     std::stringstream ss;
 

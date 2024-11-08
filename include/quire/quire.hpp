@@ -194,15 +194,15 @@ private:
     /// @brief Logs a message by splitting lines and formatting output.
     /// @param level Log level.
     /// @param location Source location.
-    /// @param buffer Message buffer.
-    void do_log(log_level level, const std::string &location, const char *buffer) const;
+    /// @param content Message content.
+    void write_log(log_level level, const std::string &location, const char *content) const;
 
     /// @brief Writes formatted log information.
     /// @param level Log level.
     /// @param location Source location.
     /// @param line Message content.
     /// @param length Length of the message.
-    void write_log(log_level level, const std::string &location, const char *line, std::size_t length) const;
+    void write_log_line(log_level level, const std::string &location, const char *line, std::size_t length) const;
 
     std::shared_ptr<file_handler_t> fhandler; ///< File handler for output.
     std::ostream *stream;                     ///< Output stream for logging.
