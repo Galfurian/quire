@@ -268,35 +268,15 @@ void logger_t::log(log_level level, char const *format, ...)
     // Ensure thread safety by locking the mutex.
     std::lock_guard<std::mutex> lock(mtx);
 
-    // Check if the current log level is greater than or equal to the minimum log level.
     if (level >= min_level) {
         // Format the message.
         va_list args;
         va_start(args, format);
-        format_message(format, args);
+        this->format_message(format, args);
         va_end(args);
 
-        // The source location where the log is generated.
-        const std::string location;
-
-        // Process the buffer directly without copying to std::string.
-        const char *start   = buffer;
-        const char *newline = nullptr;
-
-        // Split the buffer by lines and call do_log for each line
-        while ((newline = std::strchr(start, '\n')) != nullptr) {
-            // Create a string view-like object.
-            std::string line(start, newline - start + 1);
-            // Execute the log.
-            this->do_log(level, location, line.c_str());
-            // Move to the next line.
-            start = newline + 1;
-        }
-
-        // Log any remaining content after the last newline.
-        if (*start != '\0') {
-            this->do_log(level, location, start);
-        }
+        // Pass the level, location, and buffer to do_log.
+        this->do_log(level, std::string(), buffer);
     }
 }
 
@@ -305,39 +285,42 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
     // Ensure thread safety by locking the mutex.
     std::lock_guard<std::mutex> lock(mtx);
 
-    // Check if the current log level is greater than or equal to the minimum log level.
     if (level >= min_level) {
         // Format the message.
         va_list args;
         va_start(args, format);
-        format_message(format, args);
+        this->format_message(format, args);
         va_end(args);
 
-        // The source location where the log is generated.
-        std::string location = __assemble_location(file, line);
-
-        // Process the buffer directly without copying to std::string.
-        const char *start   = buffer;
-        const char *newline = nullptr;
-
-        // Split the buffer by lines and call do_log for each line
-        while ((newline = std::strchr(start, '\n')) != nullptr) {
-            // Create a string view-like object.
-            std::string line(start, newline - start + 1);
-            // Execute the log.
-            this->do_log(level, location, line.c_str());
-            // Move to the next line.
-            start = newline + 1;
-        }
-
-        // Log any remaining content after the last newline.
-        if (*start != '\0') {
-            this->do_log(level, location, start);
-        }
+        // Pass the level, location, and buffer to do_log.
+        this->do_log(level, __assemble_location(file, line), buffer);
     }
 }
 
-void logger_t::do_log(log_level level, const std::string &location, const char *line) const
+void logger_t::do_log(log_level level, const std::string &location, const char *buffer) const
+{
+    const char *start   = buffer;
+    const char *newline = nullptr;
+
+    // Split the buffer by lines and log each line individually.
+    while ((newline = std::strchr(start, '\n')) != nullptr) {
+        // Calculate the length of the line.
+        std::size_t line_length = static_cast<std::size_t>(newline - start + 1);
+
+        // Log the line with the current location.
+        this->write_log(level, location, start, line_length);
+
+        // Move to the next line.
+        start = newline + 1;
+    }
+
+    // Log any remaining content after the last newline.
+    if (*start != '\0') {
+        this->write_log(level, location, start, std::strlen(start));
+    }
+}
+
+void logger_t::write_log(log_level level, const std::string &location, const char *line, std::size_t length) const
 {
     std::stringstream ss;
 
@@ -374,10 +357,10 @@ void logger_t::do_log(log_level level, const std::string &location, const char *
     // Check that the line is not empty.
     if ((line != NULL) && (line[0] != '\0')) {
         // Write the actual log message.
-        ss << line;
+        ss.write(line, static_cast<std::streamsize>(length));
 
-        // Update the newline flag based on the current message
-        last_log_ended_with_newline = (line[strlen(line) - 1] == '\n');
+        // Update the newline flag based on the current message's last character.
+        last_log_ended_with_newline = (length > 0 && line[length - 1] == '\n');
     }
 
     // == WRITE TO FILE STREAM ================================================

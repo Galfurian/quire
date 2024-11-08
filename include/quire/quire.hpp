@@ -1,6 +1,7 @@
 /// @file quire.hpp
 /// @author Enrico Fraccaroli (enry.frak@gmail.com)
-/// @brief The quire logger source dode.
+/// @brief Quire logging system header file providing logging functionality with
+/// levels, colors, and configurable options.
 
 #pragma once
 
@@ -86,128 +87,135 @@ enum configuration {
     show_all      = show_level | show_date | show_time | show_colored | show_location ///< We show everything.
 };
 
-/// @brief Handles output files.
+/// @brief Manages file output for logs.
 class file_handler_t {
 private:
-    /// @brief An handler for the file.
-    FILE *stream;
+    FILE *stream; ///< File pointer for log output.
 
 public:
-    /// @brief Construct the handler and opens the file.
-    /// @param filename the filename.
-    /// @param mode the mode with which we open it.
+    /// @brief Opens a file for logging.
+    /// @param filename Name of the file.
+    /// @param mode Mode in which the file is opened.
     file_handler_t(const char *filename, const char *mode);
 
-    /// @brief Destroy the handler and closes the file.
+    /// @brief Closes the file upon destruction.
     ~file_handler_t();
 
-    /// @brief Writes the buffer on file, if the handler is valid.
-    /// @param buffer the buffer to write.
-    /// @return how much we wrote, 0 if we write nothing.
+    /// @brief Writes the provided buffer to the file.
+    /// @param buffer Content to be written.
+    /// @return Number of bytes written, 0 if failed.
     std::size_t write(const std::string &buffer);
 };
 
-/// @brief The logger class.
+/// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
-    /// @brief Construct a new logger.
-    /// @param _header the header shown every time the log is printed.
-    /// @param _min_level the minimal level we will print for this logger.
-    /// @param _separator the semparator used for dividing all the log information.
+    /// @brief Constructs a logger with specified settings.
+    /// @param _header Header for each log entry.
+    /// @param _min_level Minimum level to be logged.
+    /// @param _separator Character separating log components.
     explicit logger_t(std::string _header, log_level _min_level, char _separator);
 
+    /// @brief Destructor for cleanup.
     ~logger_t();
 
-    /// @brief Retuns the header.
+    /// @brief Retrieves the current header.
     std::string get_header() const;
-    
-    /// @brief Returns the current log level.
+
+    /// @brief Retrieves the current log level.
     log_level get_log_level() const;
 
-    /// @brief Resets the color to the default ones.
+    /// @brief Resets the log colors to defaults.
     void reset_colors();
 
-    /// @brief Sets the file handler.
+    /// @brief Sets the file handler for log output.
+    /// @param _fhandler File handler instance.
     void set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
 
-    /// @brief Sets the output stream.
+    /// @brief Sets the output stream for log output.
+    /// @param _stream Output stream.
     void set_output_stream(std::ostream *_stream);
 
-    /// @brief Sets the header.
+    /// @brief Updates the log header.
+    /// @param _header New header string.
     void set_header(std::string _header);
 
-    /// @brief Sets the log level.
+    /// @brief Sets the log level threshold.
+    /// @param _level Minimum log level.
     void set_log_level(log_level _level);
 
-    /// @brief Sets the separator.
+    /// @brief Updates the separator character.
+    /// @param _separator New separator character.
     void set_separator(char _separator);
 
-    /// @brief Sets the color for a given log level.
-    /// @param level the level we want to customize.
-    /// @param fg the foreground color we want to use (default: quire::ansi::fg::white).
-    /// @param bg the background color we want to use (default: quire::ansi::util::reset).
+    /// @brief Assigns colors for a specific log level.
+    /// @param level Log level to set colors for.
+    /// @param fg Foreground color (default: white).
+    /// @param bg Background color (default: reset).
     void set_color(log_level level, const char *fg, const char *bg);
 
-    /// @brief Turns on/off the level.
+    /// @brief Configures display options using bitmask settings.
+    /// @param _config Bitmask configuration.
     void configure(int _config);
 
-    /// @brief Turns on/off the level.
+    /// @brief Enables or disables log level display.
     void toggle_level(bool enable);
 
-    /// @brief Turns on/off the color.
+    /// @brief Enables or disables colored output.
     void toggle_color(bool enable);
 
-    /// @brief Turns on/off the date.
+    /// @brief Enables or disables date display.
     void toggle_date(bool enable);
 
-    /// @brief Turns on/off the time.
+    /// @brief Enables or disables time display.
     void toggle_time(bool enable);
 
-    /// @brief Turns on/off the location inside the file.
+    /// @brief Enables or disables file location display.
     void toggle_location(bool enable);
 
-    /// @brief Perform the logging.
+    /// @brief Logs a message with formatting.
+    /// @param level Log level.
+    /// @param format Format string.
     void log(log_level level, char const *format, ...);
 
-    /// @brief Perform the logging.
+    /// @brief Logs a message with location information.
+    /// @param level Log level.
+    /// @param file Source file name.
+    /// @param line Source line number.
+    /// @param format Format string.
     void log(log_level level, char const *file, int line, char const *format, ...);
 
 private:
-    /// @brief Helper function to handle formatting and buffer allocation.
-    /// @param format The format string for the message.
-    /// @param args The variable argument list for formatting.
+    /// @brief Helper for formatting messages.
+    /// @param format Format string.
+    /// @param args Variable arguments.
     void format_message(char const *format, va_list args);
 
-    /// @brief Logs information with specified log level and location to the stream or file.
-    /// @param level The log level to log (e.g., info, warning, error).
-    /// @param location The source location where the log is generated.
-    /// @param line The buffer containing the log message to be logged.
-    void do_log(log_level level, const std::string &location, const char *line) const;
+    /// @brief Logs a message by splitting lines and formatting output.
+    /// @param level Log level.
+    /// @param location Source location.
+    /// @param buffer Message buffer.
+    void do_log(log_level level, const std::string &location, const char *buffer) const;
 
-    /// @brief A pointer to the file handler.
-    std::shared_ptr<file_handler_t> fhandler;
-    /// @brief A pointer to the output stream.
-    std::ostream *stream;
-    /// @brief A mutex to protect the use of the logger.
-    std::mutex mtx;
-    /// @brief A header which is pre-pended to each logger line.
-    std::string header;
-    /// @brief The minimum level we are going to log.
-    log_level min_level;
-    // Class member to track if the last log ended with a newline
-    mutable bool last_log_ended_with_newline;
-    /// @brief Internal configuration of the logger.
-    int config;
-    /// @brief The character we use to separate elements of the log.
-    char separator;
-    /// @brief Internal buffer for handling output formatting.
-    char *buffer;
-    /// @brief The current size of the buffer.
-    std::size_t buffer_length;
-    /// @brief Keeps track of the association between log level and foreground color.
-    const char *fg_colors[5];
-    /// @brief Keeps track of the association between log level and background color.
-    const char *bg_colors[5];
+    /// @brief Writes formatted log information.
+    /// @param level Log level.
+    /// @param location Source location.
+    /// @param line Message content.
+    /// @param length Length of the message.
+    void write_log(log_level level, const std::string &location, const char *line, std::size_t length) const;
+
+    std::shared_ptr<file_handler_t> fhandler; ///< File handler for output.
+    std::ostream *stream;                     ///< Output stream for logging.
+    std::mutex mtx;                           ///< Mutex for thread safety.
+    std::string header;                       ///< Header for each log entry.
+    log_level min_level;                      ///< Minimum log level threshold.
+    mutable bool last_log_ended_with_newline; ///< Tracks if last log ended with newline.
+    int config;                               ///< Configuration bitmask.
+    char separator;                           ///< Separator character for log components.
+    char *buffer;                             ///< Buffer for formatting log messages.
+    std::size_t buffer_length;                ///< Current buffer size.
+    const char *fg_colors[5];                 ///< Foreground colors for each log level.
+    const char *bg_colors[5];                 ///< Background colors for each log level.
 };
 
 } // namespace quire

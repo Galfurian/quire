@@ -7,7 +7,6 @@
 namespace quire
 {
 
-/// @brief Construct a new registry object.
 registry_t::registry_t()
     : m_map(),
       mtx()
@@ -15,18 +14,11 @@ registry_t::registry_t()
     // Nothing to do.
 }
 
-/// @brief Returns a copy of the loggers map.
 const registry_t::map_t &registry_t::loggers() const
 {
     return m_map;
 }
 
-/// @brief Creates a new logger.
-/// @param key the key associated with the logger.
-/// @param _header the header shown every time the log is printed.
-/// @param _min_level the minimal level we will print for this logger.
-/// @param _separator the semparator used for dividing all the log information.
-/// @return value_t the newly created logger.
 registry_t::value_t registry_t::create(key_t key, std::string _header, log_level _min_level, char _separator)
 {
     std::lock_guard<std::mutex> lock(mtx);
@@ -67,9 +59,6 @@ registry_t::value_t registry_t::insert(key_t key, value_t logger)
     return logger;
 }
 
-/// @brief Removes the logger associated with the given key.
-/// @param key the key associated with the logger.
-/// @return a copy of the logger.
 registry_t::value_t registry_t::remove(key_t key)
 {
     std::lock_guard<std::mutex> lock(mtx);
@@ -85,25 +74,18 @@ registry_t::value_t registry_t::remove(key_t key)
     return it->second;
 }
 
-/// @brief Clears the map from all the loggers.
 void registry_t::clear()
 {
     std::lock_guard<std::mutex> lock(mtx);
     m_map.clear();
 }
 
-/// @brief Checks if the registry contains the given logger.
-/// @param key the key associated with the logger.
-/// @return true if the logger exists, false otherwise.
 bool registry_t::contains(key_t key) const
 {
     const_iterator it = m_map.find(key);
     return it != m_map.end();
 }
 
-/// @brief Returns the logger associated with the given key.
-/// @param key the key associated with the logger.
-/// @return a reference to the logger.
 const registry_t::value_t registry_t::get(key_t key) const
 {
     // Check if the logger exists.
@@ -116,9 +98,6 @@ const registry_t::value_t registry_t::get(key_t key) const
     return it->second;
 }
 
-/// @brief Returns the logger associated with the given key.
-/// @param key the key associated with the logger.
-/// @return a reference to the logger.
 registry_t::value_t registry_t::get(key_t key)
 {
     // Check if the logger exists.
@@ -131,9 +110,6 @@ registry_t::value_t registry_t::get(key_t key)
     return it->second;
 }
 
-/// @brief Returns the logger associated with the given key.
-/// @param key the key associated with the logger.
-/// @return a reference to the logger.
 registry_t::value_t registry_t::operator[](key_t key)
 {
     // Check if the logger exists.
@@ -146,9 +122,6 @@ registry_t::value_t registry_t::operator[](key_t key)
     return it->second;
 }
 
-/// @brief Returns the logger associated with the given key.
-/// @param key the key associated with the logger.
-/// @return a reference to the logger.
 const registry_t::value_t registry_t::operator[](key_t key) const
 {
     // Check if the logger exists.
