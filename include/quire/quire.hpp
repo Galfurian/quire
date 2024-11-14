@@ -95,20 +95,12 @@ public:
     /// @param _header Header text included at the start of each log entry.
     /// @param _min_level Minimum log level required for messages to be logged; messages below this level are ignored.
     /// @param _separator Character used to separate different components (e.g., timestamp, level, message) in each log entry.
-    /// @param enable_level If true, includes the log level in each log entry.
-    /// @param enable_color If true, enables colored output for log entries based on log level (for terminals that support color).
-    /// @param enable_date If true, adds the current date to each log entry.
-    /// @param enable_time If true, includes the timestamp for each log entry.
-    /// @param enable_location If true, includes the file and line number where the log entry originated.
+    /// @param _show_config Bitmask configuration.
     explicit logger_t(
         std::string _header,
         log_level _min_level,
         char _separator,
-        bool enable_level    = true,
-        bool enable_color    = true,
-        bool enable_date     = true,
-        bool enable_time     = true,
-        bool enable_location = true);
+        int _show_config = show_all);
 
     /// @brief Destructor for cleanup.
     ~logger_t();
@@ -155,9 +147,9 @@ public:
     logger_t &set_color(log_level level, const char *fg, const char *bg);
 
     /// @brief Configures display options using bitmask settings.
-    /// @param _config Bitmask configuration.
+    /// @param _show_config Bitmask configuration.
     /// @return Reference to the logger instance.
-    logger_t &configure(int _config);
+    logger_t &configure(int _show_config);
 
     /// @brief Enables or disables log level display.
     /// @param enable Whether to enable or disable the log level display.
@@ -221,7 +213,7 @@ private:
     std::string header;                       ///< Header for each log entry.
     log_level min_level;                      ///< Minimum log level threshold.
     mutable bool last_log_ended_with_newline; ///< Tracks if last log ended with newline.
-    int config;                               ///< Configuration bitmask.
+    int show_config;                          ///< Configuration bitmask.
     char separator;                           ///< Separator character for log components.
     char *buffer;                             ///< Buffer for formatting log messages.
     std::size_t buffer_length;                ///< Current buffer size.

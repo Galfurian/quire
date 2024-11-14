@@ -102,22 +102,14 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(
-    std::string _header,
-    log_level _min_level,
-    char _separator,
-    bool enable_level,
-    bool enable_color,
-    bool enable_date,
-    bool enable_time,
-    bool enable_location)
+logger_t::logger_t(std::string _header, log_level _min_level, char _separator, int _show_config)
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
       header(_header),
       min_level(_min_level),
       last_log_ended_with_newline(true),
-      config(0),
+      show_config(_show_config),
       separator(_separator),
       buffer(nullptr),
       buffer_length(0),
@@ -137,13 +129,6 @@ logger_t::logger_t(
     bg_colors[warning]  = quire::ansi::util::reset;
     bg_colors[error]    = quire::ansi::util::reset;
     bg_colors[critical] = quire::ansi::util::reset;
-
-    // Set configuration.
-    (enable_level) ? (config |= show_level) : (config &= ~show_level);
-    (enable_color) ? (config |= show_color) : (config &= ~show_color);
-    (enable_date) ? (config |= show_date) : (config &= ~show_date);
-    (enable_time) ? (config |= show_time) : (config &= ~show_time);
-    (enable_location) ? (config |= show_location) : (config &= ~show_location);
 }
 
 logger_t::~logger_t()
@@ -218,39 +203,39 @@ logger_t &logger_t::set_color(log_level level, const char *fg, const char *bg)
     return *this;
 }
 
-logger_t &logger_t::configure(int _config)
+logger_t &logger_t::configure(int _show_config)
 {
-    config = _config;
+    show_config = _show_config;
     return *this;
 }
 
 logger_t &logger_t::toggle_level(bool enable)
 {
-    (enable) ? (config |= show_level) : (config &= ~show_level);
+    (enable) ? (show_config |= show_level) : (show_config &= ~show_level);
     return *this;
 }
 
 logger_t &logger_t::toggle_color(bool enable)
 {
-    (enable) ? (config |= show_color) : (config &= ~show_color);
+    (enable) ? (show_config |= show_color) : (show_config &= ~show_color);
     return *this;
 }
 
 logger_t &logger_t::toggle_date(bool enable)
 {
-    (enable) ? (config |= show_date) : (config &= ~show_date);
+    (enable) ? (show_config |= show_date) : (show_config &= ~show_date);
     return *this;
 }
 
 logger_t &logger_t::toggle_time(bool enable)
 {
-    (enable) ? (config |= show_time) : (config &= ~show_time);
+    (enable) ? (show_config |= show_time) : (show_config &= ~show_time);
     return *this;
 }
 
 logger_t &logger_t::toggle_location(bool enable)
 {
-    (enable) ? (config |= show_location) : (config &= ~show_location);
+    (enable) ? (show_config |= show_location) : (show_config &= ~show_location);
     return *this;
 }
 
@@ -355,11 +340,11 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
     std::stringstream ss;
 
     // == FLAGS ==========================================================
-    bool _show_level    = (config & show_level) == show_level;
-    bool _show_date     = (config & show_date) == show_date;
-    bool _show_time     = (config & show_time) == show_time;
-    bool _show_color    = (config & show_color) == show_color;
-    bool _show_location = (config & show_location) == show_location;
+    bool _show_level    = (show_config & show_level) == show_level;
+    bool _show_date     = (show_config & show_date) == show_date;
+    bool _show_time     = (show_config & show_time) == show_time;
+    bool _show_color    = (show_config & show_color) == show_color;
+    bool _show_location = (show_config & show_location) == show_location;
 
     // == LOG INFORMATION =====================================================
     // Add the header only if the previous log ended with a newline
