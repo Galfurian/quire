@@ -78,23 +78,37 @@ enum log_level {
 
 /// @brief Configuration bitmasks.
 enum configuration {
-    show_nothing  = 0u,                                                               ///< No bit.
-    show_level    = (1u << 0u),                                                       ///< We show the log level.
-    show_date     = (1u << 1u),                                                       ///< We show the data.
-    show_time     = (1u << 2u),                                                       ///< We show the time.
-    show_colored  = (1u << 3u),                                                       ///< We show a colored log.
-    show_location = (1u << 4u),                                                       ///< We show the location inside the file.
-    show_all      = show_level | show_date | show_time | show_colored | show_location ///< We show everything.
+    show_nothing  = 0u,                                                             ///< No bit.
+    show_level    = (1u << 0u),                                                     ///< We show the log level.
+    show_date     = (1u << 1u),                                                     ///< We show the data.
+    show_time     = (1u << 2u),                                                     ///< We show the time.
+    show_color    = (1u << 3u),                                                     ///< We show a colored log.
+    show_location = (1u << 4u),                                                     ///< We show the location inside the file.
+    show_all      = show_level | show_date | show_time | show_color | show_location ///< We show everything.
 };
 
 /// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
-    /// @brief Constructs a logger with specified settings.
-    /// @param _header Header for each log entry.
-    /// @param _min_level Minimum level to be logged.
-    /// @param _separator Character separating log components.
-    explicit logger_t(std::string _header, log_level _min_level, char _separator);
+
+    /// @brief Constructs a logger with specified settings for formatting and filtering log entries.
+    /// @param _header Header text included at the start of each log entry.
+    /// @param _min_level Minimum log level required for messages to be logged; messages below this level are ignored.
+    /// @param _separator Character used to separate different components (e.g., timestamp, level, message) in each log entry.
+    /// @param enable_level If true, includes the log level in each log entry.
+    /// @param enable_color If true, enables colored output for log entries based on log level (for terminals that support color).
+    /// @param enable_date If true, adds the current date to each log entry.
+    /// @param enable_time If true, includes the timestamp for each log entry.
+    /// @param enable_location If true, includes the file and line number where the log entry originated.
+    explicit logger_t(
+        std::string _header,
+        log_level _min_level,
+        char _separator,
+        bool enable_level    = true,
+        bool enable_color    = true,
+        bool enable_date     = true,
+        bool enable_time     = true,
+        bool enable_location = true);
 
     /// @brief Destructor for cleanup.
     ~logger_t();

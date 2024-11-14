@@ -102,7 +102,15 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
+logger_t::logger_t(
+    std::string _header,
+    log_level _min_level,
+    char _separator,
+    bool enable_level,
+    bool enable_color,
+    bool enable_date,
+    bool enable_time,
+    bool enable_location)
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
@@ -116,7 +124,26 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
       fg_colors(),
       bg_colors()
 {
-    this->reset_colors();
+    // Default foreground colors.
+    fg_colors[debug]    = ansi::fg::cyan;
+    fg_colors[info]     = ansi::fg::bright_white;
+    fg_colors[warning]  = ansi::fg::bright_yellow;
+    fg_colors[error]    = ansi::fg::red;
+    fg_colors[critical] = ansi::fg::bright_red;
+
+    // By default we do not have background colors.
+    bg_colors[debug]    = quire::ansi::util::reset;
+    bg_colors[info]     = quire::ansi::util::reset;
+    bg_colors[warning]  = quire::ansi::util::reset;
+    bg_colors[error]    = quire::ansi::util::reset;
+    bg_colors[critical] = quire::ansi::util::reset;
+
+    // Set configuration.
+    (enable_level) ? (config |= show_level) : (config &= ~show_level);
+    (enable_color) ? (config |= show_color) : (config &= ~show_color);
+    (enable_date) ? (config |= show_date) : (config &= ~show_date);
+    (enable_time) ? (config |= show_time) : (config &= ~show_time);
+    (enable_location) ? (config |= show_location) : (config &= ~show_location);
 }
 
 logger_t::~logger_t()
@@ -205,7 +232,7 @@ logger_t &logger_t::toggle_level(bool enable)
 
 logger_t &logger_t::toggle_color(bool enable)
 {
-    (enable) ? (config |= show_colored) : (config &= ~show_colored);
+    (enable) ? (config |= show_color) : (config &= ~show_color);
     return *this;
 }
 
@@ -331,7 +358,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
     bool _show_level    = (config & show_level) == show_level;
     bool _show_date     = (config & show_date) == show_date;
     bool _show_time     = (config & show_time) == show_time;
-    bool _show_colored  = (config & show_colored) == show_colored;
+    bool _show_color    = (config & show_color) == show_color;
     bool _show_location = (config & show_location) == show_location;
 
     // == LOG INFORMATION =====================================================
@@ -373,7 +400,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
 
     if (ostream) {
         // == COLOR (ON) ======================================================
-        if (_show_colored && (level >= debug) && (level <= critical)) {
+        if (_show_color && (level >= debug) && (level <= critical)) {
             (*ostream) << bg_colors[level] << fg_colors[level];
         }
 
@@ -381,7 +408,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         (*ostream) << ss.str();
 
         // == COLOR (OFF) =====================================================
-        if (_show_colored) {
+        if (_show_color) {
             (*ostream) << ansi::util::reset;
         }
     }
