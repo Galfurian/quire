@@ -45,7 +45,7 @@ void registry_create()
         }
     }
     auto &logger = quire::get_logger(1);
-    logger.configure(quire::show_all);
+    logger.configure(quire::configuration_show_all);
     qdebug(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
     qinfo(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
     qwarning(logger, "Hello %s, the temperature is %d.\n", "friend", 10);
@@ -56,16 +56,16 @@ void registry_create()
 int main(int, char *[])
 {
     auto &ri = quire::create_logger(0, "RegistryInt(0)", quire::log_level::debug, '|');
-    ri.configure(quire::show_all);
+    ri.configure(quire::configuration_show_all);
     registry_int();
-    ri.configure(quire::show_nothing);
+    ri.configure({});
     registry_int();
 
     registry_create();
 
-    quire::create_logger(local, "local", quire::log_level::debug, '|').configure(quire::show_all);
-    quire::create_logger(global, "global", quire::log_level::debug, '|').configure(quire::show_all);
-    quire::create_logger(admin, "admin", quire::log_level::debug, '|').configure(quire::show_all);
+    quire::create_logger(local, "local", quire::log_level::debug, '|').configure(quire::configuration_show_all);
+    quire::create_logger(global, "global", quire::log_level::debug, '|').configure(quire::configuration_show_all);
+    quire::create_logger(admin, "admin", quire::log_level::debug, '|').configure(quire::configuration_show_all);
     registry_enum();
     return 0;
 }

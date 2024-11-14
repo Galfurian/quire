@@ -102,14 +102,15 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, log_level _min_level, char _separator, int _show_config)
+logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const configuration_t &_config)
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
       header(_header),
       min_level(_min_level),
       last_log_ended_with_newline(true),
-      show_config(_show_config),
+      enable_color(true),
+      config(_config),
       separator(_separator),
       buffer(nullptr),
       buffer_length(0),
@@ -200,42 +201,6 @@ logger_t &logger_t::set_color(log_level level, const char *fg, const char *bg)
         fg_colors[level] = fg;
         bg_colors[level] = bg;
     }
-    return *this;
-}
-
-logger_t &logger_t::configure(int _show_config)
-{
-    show_config = _show_config;
-    return *this;
-}
-
-logger_t &logger_t::toggle_level(bool enable)
-{
-    (enable) ? (show_config |= show_level) : (show_config &= ~show_level);
-    return *this;
-}
-
-logger_t &logger_t::toggle_color(bool enable)
-{
-    (enable) ? (show_config |= show_color) : (show_config &= ~show_color);
-    return *this;
-}
-
-logger_t &logger_t::toggle_date(bool enable)
-{
-    (enable) ? (show_config |= show_date) : (show_config &= ~show_date);
-    return *this;
-}
-
-logger_t &logger_t::toggle_time(bool enable)
-{
-    (enable) ? (show_config |= show_time) : (show_config &= ~show_time);
-    return *this;
-}
-
-logger_t &logger_t::toggle_location(bool enable)
-{
-    (enable) ? (show_config |= show_location) : (show_config &= ~show_location);
     return *this;
 }
 
@@ -339,33 +304,22 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
 {
     std::stringstream ss;
 
-    // == FLAGS ==========================================================
-    bool _show_level    = (show_config & show_level) == show_level;
-    bool _show_date     = (show_config & show_date) == show_date;
-    bool _show_time     = (show_config & show_time) == show_time;
-    bool _show_color    = (show_config & show_color) == show_color;
-    bool _show_location = (show_config & show_location) == show_location;
-
     // == LOG INFORMATION =====================================================
     // Add the header only if the previous log ended with a newline
     if (last_log_ended_with_newline) {
         if (!header.empty()) {
             ss << header << " " << separator << " ";
         }
-        if (_show_level) {
-            ss << std::left << std::setw(9) << __log_level_to_string(level) << separator << " ";
-        }
-        if (_show_date) {
-            ss << __get_date() << " ";
-            if (!_show_time) {
-                ss << separator << " ";
+        for (const auto &option : config) {
+            if (option == option_t::level) {
+                ss << std::left << std::setw(9) << __log_level_to_string(level) << separator << " ";
+            } else if (option == option_t::date) {
+                ss << __get_date() << " ";
+            } else if (option == option_t::time) {
+                ss << __get_time() << " " << separator << " ";
+            } else if ((option == option_t::location) && !location.empty()) {
+                ss << location << " " << separator << " ";
             }
-        }
-        if (_show_time) {
-            ss << __get_time() << " " << separator << " ";
-        }
-        if (_show_location && !location.empty()) {
-            ss << location << " " << separator << " ";
         }
     }
 
@@ -385,7 +339,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
 
     if (ostream) {
         // == COLOR (ON) ======================================================
-        if (_show_color && (level >= debug) && (level <= critical)) {
+        if (enable_color && (level >= debug) && (level <= critical)) {
             (*ostream) << bg_colors[level] << fg_colors[level];
         }
 
@@ -393,7 +347,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         (*ostream) << ss.str();
 
         // == COLOR (OFF) =====================================================
-        if (_show_color) {
+        if (enable_color) {
             (*ostream) << ansi::util::reset;
         }
     }

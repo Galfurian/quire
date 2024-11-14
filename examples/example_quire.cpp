@@ -7,12 +7,8 @@
 int main(int, char *[])
 {
     quire::logger_t l0("l0", quire::log_level::debug, '|');
-
     l0.toggle_color(true);
-    l0.toggle_level(true);
-    l0.toggle_date(true);
-    l0.toggle_time(true);
-    l0.toggle_location(true);
+    l0.configure(quire::configuration_show_all);
 
     qdebug(l0, "Hello there!\n");
     qdebug(l0, "\n");
@@ -28,26 +24,27 @@ int main(int, char *[])
     qdebug(l0, "Children laughed, chasing fireflies in the ");
     qdebug(l0, "twilight as the stars began to appear.\n");
     qdebug(l0, "\n");
-    l0.toggle_date(true);
-    l0.toggle_time(false);
+    
+    l0.configure({ quire::option_t::level, quire::option_t::date, quire::option_t::location });
     qinfo(l0, "%2d\n", 10);
-    l0.toggle_date(false);
-    l0.toggle_time(true);
+
+    l0.configure({ quire::option_t::level, quire::option_t::time, quire::option_t::location });
     qwarning(l0, "%2d\n", 10);
-    l0.toggle_date(false);
-    l0.toggle_time(false);
+    
+    l0.configure({ quire::option_t::level, quire::option_t::location });
     qerror(l0, "%2d\n", 10);
-    l0.toggle_level(false);
+    
+    l0.configure({ quire::option_t::location });
     qcritical(l0, "%2d\n", 10);
-    l0.toggle_location(false);
+    
+    l0.configure({ });
     qdebug(l0, "%.2f\n", 3.14);
 
     l0.set_log_level(quire::log_level::info);
 
-    l0.toggle_location(false);
     qdebug(l0, "%.2f\n", 3.14);
 
-    l0.toggle_time(true);
+    l0.configure({ quire::option_t::time });
     qinfo(l0, "%2d\n", 10);
 
     l0.set_header("");

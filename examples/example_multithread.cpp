@@ -40,25 +40,25 @@ void producer_fun()
 void consumer_fun()
 {
     std::unique_lock<std::mutex> lock(mtx);
-    auto& global = quire::get_logger(channel_global);
+    auto &global = quire::get_logger(channel_global);
     condition.wait(lock, [&]() { return product.ready; });
     qdebug(global, "%d * %d = %d\n", product.a, product.b, product.a * product.b);
 }
 
 int main(int, char *[])
 {
-    auto& local  = quire::create_logger(channel_local, "local", quire::log_level::debug, '|');
-    auto& global = quire::create_logger(channel_global, "global", quire::log_level::debug, '|');
-    auto& admin  = quire::create_logger(channel_admin, "admin", quire::log_level::debug, '|');
+    auto &local  = quire::create_logger(channel_local, "local", quire::log_level::debug, '|');
+    auto &global = quire::create_logger(channel_global, "global", quire::log_level::debug, '|');
+    auto &admin  = quire::create_logger(channel_admin, "admin", quire::log_level::debug, '|');
 
-    local.configure(quire::show_all);
     local.set_color(quire::debug, quire::ansi::fg::bright_cyan, quire::ansi::util::reset);
+    local.configure(quire::configuration_show_all);
 
-    global.configure(quire::show_all);
     global.set_color(quire::debug, quire::ansi::fg::bright_yellow, quire::ansi::util::reset);
+    global.configure(quire::configuration_show_all);
 
-    admin.configure(quire::show_all);
     admin.set_color(quire::debug, quire::ansi::fg::bright_red, quire::ansi::util::reset);
+    admin.configure(quire::configuration_show_all);
 
     std::thread producer(producer_fun);
     std::thread consumer(consumer_fun);

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <fstream>
+#include <vector>
 #include <memory>
 #include <mutex>
 
@@ -77,30 +78,31 @@ enum log_level {
 };
 
 /// @brief Configuration bitmasks.
-enum configuration {
-    show_nothing  = 0u,                                                             ///< No bit.
-    show_level    = (1u << 0u),                                                     ///< We show the log level.
-    show_date     = (1u << 1u),                                                     ///< We show the data.
-    show_time     = (1u << 2u),                                                     ///< We show the time.
-    show_color    = (1u << 3u),                                                     ///< We show a colored log.
-    show_location = (1u << 4u),                                                     ///< We show the location inside the file.
-    show_all      = show_level | show_date | show_time | show_color | show_location ///< We show everything.
+enum class option_t {
+    level,
+    location,
+    date,
+    time
 };
+
+using configuration_t = std::vector<option_t>;
+
+[[maybe_unused]] static configuration_t configuration_show_all{ option_t::level, option_t::location, option_t::date, option_t::location };
+[[maybe_unused]] static configuration_t configuration_default{ option_t::level, option_t::date, option_t::location };
 
 /// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
-
     /// @brief Constructs a logger with specified settings for formatting and filtering log entries.
     /// @param _header Header text included at the start of each log entry.
     /// @param _min_level Minimum log level required for messages to be logged; messages below this level are ignored.
     /// @param _separator Character used to separate different components (e.g., timestamp, level, message) in each log entry.
-    /// @param _show_config Bitmask configuration.
+    /// @param _config Header configuration.
     explicit logger_t(
         std::string _header,
         log_level _min_level,
         char _separator,
-        int _show_config = show_all);
+        const configuration_t &_config = configuration_default);
 
     /// @brief Destructor for cleanup.
     ~logger_t();
@@ -146,35 +148,23 @@ public:
     /// @return Reference to the logger instance.
     logger_t &set_color(log_level level, const char *fg, const char *bg);
 
-    /// @brief Configures display options using bitmask settings.
-    /// @param _show_config Bitmask configuration.
-    /// @return Reference to the logger instance.
-    logger_t &configure(int _show_config);
-
-    /// @brief Enables or disables log level display.
-    /// @param enable Whether to enable or disable the log level display.
-    /// @return Reference to the logger instance.
-    logger_t &toggle_level(bool enable);
-
     /// @brief Enables or disables colored output.
     /// @param enable Whether to enable or disable colored output.
     /// @return Reference to the logger instance.
-    logger_t &toggle_color(bool enable);
+    logger_t &toggle_color(bool enable)
+    {
+        enable_color = enable;
+        return *this;
+    }
 
-    /// @brief Enables or disables date display.
-    /// @param enable Whether to enable or disable date display.
+    /// @brief Configures display options using bitmask settings.
+    /// @param _config Header configuration.
     /// @return Reference to the logger instance.
-    logger_t &toggle_date(bool enable);
-
-    /// @brief Enables or disables time display.
-    /// @param enable Whether to enable or disable time display.
-    /// @return Reference to the logger instance.
-    logger_t &toggle_time(bool enable);
-
-    /// @brief Enables or disables file location display.
-    /// @param enable Whether to enable or disable file location display.
-    /// @return Reference to the logger instance.
-    logger_t &toggle_location(bool enable);
+    logger_t &configure(const configuration_t &_config)
+    {
+        config = _config;
+        return *this;
+    }
 
     /// @brief Logs a message with formatting.
     /// @param level Log level.
@@ -213,7 +203,8 @@ private:
     std::string header;                       ///< Header for each log entry.
     log_level min_level;                      ///< Minimum log level threshold.
     mutable bool last_log_ended_with_newline; ///< Tracks if last log ended with newline.
-    int show_config;                          ///< Configuration bitmask.
+    bool enable_color;                        ///< Are colors enabled.
+    configuration_t config;                   ///< Configuration of shown information.
     char separator;                           ///< Separator character for log components.
     char *buffer;                             ///< Buffer for formatting log messages.
     std::size_t buffer_length;                ///< Current buffer size.
