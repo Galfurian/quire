@@ -124,54 +124,71 @@ public:
 
     /// @brief Retrieves the current log level.
     log_level get_log_level() const;
-
     /// @brief Resets the log colors to defaults.
-    void reset_colors();
+    /// @return Reference to the logger instance.
+    logger_t &reset_colors();
 
     /// @brief Sets the file handler for log output.
     /// @param _fhandler File handler instance.
-    void set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
+    /// @return Reference to the logger instance.
+    logger_t &set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
 
     /// @brief Sets the output stream for log output.
     /// @param _stream Output stream.
-    void set_output_stream(std::ostream *_stream);
+    /// @return Reference to the logger instance.
+    logger_t &set_output_stream(std::ostream *_stream);
 
     /// @brief Updates the log header.
     /// @param _header New header string.
-    void set_header(std::string _header);
+    /// @return Reference to the logger instance.
+    logger_t &set_header(std::string _header);
 
     /// @brief Sets the log level threshold.
     /// @param _level Minimum log level.
-    void set_log_level(log_level _level);
+    /// @return Reference to the logger instance.
+    logger_t &set_log_level(log_level _level);
 
     /// @brief Updates the separator character.
     /// @param _separator New separator character.
-    void set_separator(char _separator);
+    /// @return Reference to the logger instance.
+    logger_t &set_separator(char _separator);
 
     /// @brief Assigns colors for a specific log level.
     /// @param level Log level to set colors for.
     /// @param fg Foreground color (default: white).
     /// @param bg Background color (default: reset).
-    void set_color(log_level level, const char *fg, const char *bg);
+    /// @return Reference to the logger instance.
+    logger_t &set_color(log_level level, const char *fg, const char *bg);
 
     /// @brief Configures display options using bitmask settings.
     /// @param _config Bitmask configuration.
-    void configure(int _config);
+    /// @return Reference to the logger instance.
+    logger_t &configure(int _config);
 
     /// @brief Enables or disables log level display.
-    void toggle_level(bool enable);
+    /// @param enable Whether to enable or disable the log level display.
+    /// @return Reference to the logger instance.
+    logger_t &toggle_level(bool enable);
 
     /// @brief Enables or disables colored output.
-    void toggle_color(bool enable);
+    /// @param enable Whether to enable or disable colored output.
+    /// @return Reference to the logger instance.
+    logger_t &toggle_color(bool enable);
 
     /// @brief Enables or disables date display.
-    void toggle_date(bool enable);
+    /// @param enable Whether to enable or disable date display.
+    /// @return Reference to the logger instance.
+    logger_t &toggle_date(bool enable);
 
     /// @brief Enables or disables time display.
-    void toggle_time(bool enable);
+    /// @param enable Whether to enable or disable time display.
+    /// @return Reference to the logger instance.
+    logger_t &toggle_time(bool enable);
 
     /// @brief Enables or disables file location display.
-    void toggle_location(bool enable);
+    /// @param enable Whether to enable or disable file location display.
+    /// @return Reference to the logger instance.
+    logger_t &toggle_location(bool enable);
 
     /// @brief Logs a message with formatting.
     /// @param level Log level.
