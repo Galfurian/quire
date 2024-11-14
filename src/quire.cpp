@@ -80,16 +80,16 @@ static inline std::string __get_time()
 static inline const char *__log_level_to_string(log_level level)
 {
     if (level == debug) {
-        return "debug";
+        return "debug   ";
     }
     if (level == info) {
-        return "info";
+        return "info    ";
     }
     if (level == warning) {
-        return "warning";
+        return "warning ";
     }
     if (level == error) {
-        return "error";
+        return "error   ";
     }
     return "critical";
 }
@@ -310,14 +310,14 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         if (!header.empty()) {
             ss << header << " " << separator << " ";
         }
-        for (const auto &option : config) {
-            if (option == option_t::level) {
-                ss << std::left << std::setw(9) << __log_level_to_string(level) << separator << " ";
-            } else if (option == option_t::date) {
-                ss << __get_date() << " ";
-            } else if (option == option_t::time) {
+        for (std::size_t i = 0; i < config.size(); ++i) {
+            if (config[i] == option_t::level) {
+                ss << __log_level_to_string(level) << " " << separator << " ";
+            } else if (config[i] == option_t::date) {
+                ss << __get_date() << " " << separator << " ";
+            } else if (config[i] == option_t::time) {
                 ss << __get_time() << " " << separator << " ";
-            } else if ((option == option_t::location) && !location.empty()) {
+            } else if ((config[i] == option_t::location) && !location.empty()) {
                 ss << location << " " << separator << " ";
             }
         }
