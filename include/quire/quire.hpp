@@ -87,26 +87,6 @@ enum configuration {
     show_all      = show_level | show_date | show_time | show_colored | show_location ///< We show everything.
 };
 
-/// @brief Manages file output for logs.
-class file_handler_t {
-private:
-    FILE *stream; ///< File pointer for log output.
-
-public:
-    /// @brief Opens a file for logging.
-    /// @param filename Name of the file.
-    /// @param mode Mode in which the file is opened.
-    file_handler_t(const char *filename, const char *mode);
-
-    /// @brief Closes the file upon destruction.
-    ~file_handler_t();
-
-    /// @brief Writes the provided buffer to the file.
-    /// @param buffer Content to be written.
-    /// @return Number of bytes written, 0 if failed.
-    std::size_t write(const std::string &buffer);
-};
-
 /// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
@@ -129,14 +109,14 @@ public:
     logger_t &reset_colors();
 
     /// @brief Sets the file handler for log output.
-    /// @param _fhandler File handler instance.
+    /// @param _fstream File handler instance.
     /// @return Reference to the logger instance.
-    logger_t &set_file_handler(std::shared_ptr<file_handler_t> _fhandler);
+    logger_t &set_file_handler(std::ostream *_fstream);
 
     /// @brief Sets the output stream for log output.
-    /// @param _stream Output stream.
+    /// @param _ostream Output stream.
     /// @return Reference to the logger instance.
-    logger_t &set_output_stream(std::ostream *_stream);
+    logger_t &set_output_stream(std::ostream *_ostream);
 
     /// @brief Updates the log header.
     /// @param _header New header string.
@@ -221,8 +201,8 @@ private:
     /// @param length Length of the message.
     void write_log_line(log_level level, const std::string &location, const char *line, std::size_t length) const;
 
-    std::shared_ptr<file_handler_t> fhandler; ///< File handler for output.
-    std::ostream *stream;                     ///< Output stream for logging.
+    std::ostream *ostream;                    ///< Output stream for logging.
+    std::ostream *fstream;                    ///< File handler for output.
     std::mutex mtx;                           ///< Mutex for thread safety.
     std::string header;                       ///< Header for each log entry.
     log_level min_level;                      ///< Minimum log level threshold.
@@ -238,7 +218,7 @@ private:
 } // namespace quire
 
 /// @brief Logs the message, with the given level.
-#define qlog(logger, level, ...) logger->log(level, __FILE__, __LINE__, __VA_ARGS__)
+#define qlog(logger, level, ...) logger.log(level, __FILE__, __LINE__, __VA_ARGS__)
 
 /// @brief Logs the debug message.
 #define qdebug(logger, ...) qlog(logger, quire::debug, __VA_ARGS__)

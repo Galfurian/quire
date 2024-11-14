@@ -102,30 +102,9 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-file_handler_t::file_handler_t(const char *filename, const char *mode)
-    : stream(fopen(filename, mode))
-{
-    // Nothing to do.
-}
-
-file_handler_t::~file_handler_t()
-{
-    if (stream) {
-        fclose(stream);
-    }
-}
-
-std::size_t file_handler_t::write(const std::string &buffer)
-{
-    if (stream) {
-        return fwrite(buffer.c_str(), buffer.size(), 1, stream);
-    }
-    return 0;
-}
-
 logger_t::logger_t(std::string _header, log_level _min_level, char _separator)
-    : fhandler(),
-      stream(&std::cout),
+    : ostream(&std::cout),
+      fstream(NULL),
       mtx(),
       header(_header),
       min_level(_min_level),
@@ -173,15 +152,15 @@ logger_t &logger_t::reset_colors()
     return *this;
 }
 
-logger_t &logger_t::set_file_handler(std::shared_ptr<file_handler_t> _fhandler)
+logger_t &logger_t::set_file_handler(std::ostream *_fstream)
 {
-    fhandler = _fhandler;
+    fstream = _fstream;
     return *this;
 }
 
-logger_t &logger_t::set_output_stream(std::ostream *_stream)
+logger_t &logger_t::set_output_stream(std::ostream *_ostream)
 {
-    stream = _stream;
+    ostream = _ostream;
     return *this;
 }
 
@@ -388,22 +367,22 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
     }
 
     // == WRITE TO FILE STREAM ================================================
-    if (fhandler) {
-        fhandler->write(ss.str());
+    if (fstream) {
+        (*fstream) << ss.str();
     }
 
-    if (stream) {
+    if (ostream) {
         // == COLOR (ON) ======================================================
         if (_show_colored && (level >= debug) && (level <= critical)) {
-            (*stream) << bg_colors[level] << fg_colors[level];
+            (*ostream) << bg_colors[level] << fg_colors[level];
         }
 
         // == WRITE STREAM ====================================================
-        (*stream) << ss.str();
+        (*ostream) << ss.str();
 
         // == COLOR (OFF) =====================================================
         if (_show_colored) {
-            (*stream) << ansi::util::reset;
+            (*ostream) << ansi::util::reset;
         }
     }
 }
