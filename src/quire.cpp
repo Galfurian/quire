@@ -102,7 +102,7 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const configuration_t &_config)
+logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const configuration_t &_config) noexcept
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
@@ -130,6 +130,58 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator, c
     bg_colors[warning]  = quire::ansi::util::reset;
     bg_colors[error]    = quire::ansi::util::reset;
     bg_colors[critical] = quire::ansi::util::reset;
+}
+
+logger_t::logger_t(logger_t &&other) noexcept
+    : ostream(other.ostream),
+      fstream(other.fstream),
+      header(std::move(other.header)),
+      min_level(other.min_level),
+      last_log_ended_with_newline(other.last_log_ended_with_newline),
+      enable_color(other.enable_color),
+      config(std::move(other.config)),
+      separator(other.separator),
+      buffer(other.buffer),
+      buffer_length(other.buffer_length)
+{
+    // Move the fg_colors and bg_colors arrays
+    std::copy(std::begin(other.fg_colors), std::end(other.fg_colors), fg_colors);
+    std::copy(std::begin(other.bg_colors), std::end(other.bg_colors), bg_colors);
+
+    // Nullify moved-from resources in `other`.
+    other.ostream       = nullptr;
+    other.fstream       = nullptr;
+    other.buffer        = nullptr;
+    other.buffer_length = 0;
+}
+
+void logger_t::print_logger_state() const
+{
+    std::cout << "ostream       : " << (ostream ? "valid" : "null") << '\n';
+    std::cout << "fstream       : " << (fstream ? "valid" : "null") << '\n';
+    // std::mutex mtx;
+    std::cout << "header        : " << header << '\n';
+    std::cout << "min_level     : " << static_cast<int>(min_level) << '\n';
+    std::cout << "LLEWNL        : " << (last_log_ended_with_newline ? "true" : "false") << '\n';
+    std::cout << "enable_color  : " << (enable_color ? "true" : "false") << '\n';
+    std::cout << "config        : { ";
+    for (const auto &option : config) {
+        std::cout << static_cast<int>(option) << " ";
+    }
+    std::cout << "}\n";
+    std::cout << "separator     : " << separator << '\n';
+    std::cout << "buffer        : " << (buffer ? "valid" : "null") << '\n';
+    std::cout << "buffer_length : " << buffer_length << '\n';
+    std::cout << "fg_colors     : { ";
+    for (std::size_t i = 0; i < 5; ++i) {
+        std::cout << (fg_colors[i] ? "valid" : "null") << " ";
+    }
+    std::cout << "}\n";
+    std::cout << "bg_colors     : { ";
+    for (std::size_t i = 0; i < 5; ++i) {
+        std::cout << (bg_colors[i] ? "valid" : "null") << " ";
+    }
+    std::cout << "}\n";
 }
 
 logger_t::~logger_t()

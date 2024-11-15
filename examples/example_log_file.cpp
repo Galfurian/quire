@@ -18,7 +18,7 @@ int main(int, char *[])
         return -1; // Handle the error appropriately
     }
 
-    l0.set_output_stream(&file_stream);
+    l0.set_file_handler(&file_stream);
     l0.set_output_stream(nullptr);
 
     l0.set_header("L0");

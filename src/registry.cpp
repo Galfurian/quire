@@ -60,8 +60,8 @@ registry_t::value_t &registry_t::create(const registry_t::key_t key, std::string
     }
 
     // Insert the logger directly into the map and retrieve a reference to it.
-    auto [it, success] = m_map.try_emplace(key, _header, _min_level, _separator);
-    if (!success) {
+    auto insert_it = m_map.insert(std::make_pair(key, logger_t(_header, _min_level, _separator)));
+    if (!insert_it.second) {
         std::stringstream ss;
         ss << "Failed to create logger `" << key << "`.";
         throw quire::registry_exception_t(ss.str());
@@ -71,7 +71,7 @@ registry_t::value_t &registry_t::create(const registry_t::key_t key, std::string
     this->adjust_header_length();
 
     // Return a reference to the newly created logger.
-    return it->second;
+    return insert_it.first->second;
 }
 
 void registry_t::remove(registry_t::key_t key)

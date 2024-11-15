@@ -102,7 +102,11 @@ public:
         std::string _header,
         log_level _min_level,
         char _separator,
-        const configuration_t &_config = configuration_default);
+        const configuration_t &_config = configuration_default) noexcept;
+
+    /// @brief Move constructor.
+    /// @param other The logger instance to move from.
+    logger_t(logger_t &&other) noexcept;
 
     /// @brief Destructor for cleanup.
     ~logger_t();
@@ -177,6 +181,8 @@ public:
     /// @param line Source line number.
     /// @param format Format string.
     void log(log_level level, char const *file, int line, char const *format, ...);
+
+    void print_logger_state() const;
 
 private:
     /// @brief Helper for formatting messages.

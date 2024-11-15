@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <exception>
 #include <stdexcept>
 #include <sstream>
 #include <mutex>
-#include <map>
 
 #include "quire/quire.hpp"
 
@@ -37,7 +37,7 @@ public:
     /// @brief The type used to store logger instances in the registry.
     using value_t = logger_t;
     /// @brief The map structure that associates each key with a logger instance.
-    using map_t = std::map<registry_t::key_t, registry_t::value_t>;
+    using map_t = std::unordered_map<registry_t::key_t, registry_t::value_t>;
     /// @brief An iterator type for non-constant access to the logger map.
     using iterator = typename map_t::iterator;
     /// @brief An iterator type for constant access to the logger map.
