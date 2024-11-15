@@ -370,7 +370,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
             } else if (config[i] == option_t::time) {
                 ss << __get_time() << " " << separator << " ";
             } else if ((config[i] == option_t::location) && !location.empty()) {
-                ss << location << " " << separator << " ";
+                ss << std::left << std::setw(16) << location << " " << separator << " ";
             }
         }
     }

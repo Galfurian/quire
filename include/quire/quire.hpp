@@ -87,7 +87,7 @@ enum class option_t {
 
 using configuration_t = std::vector<option_t>;
 
-[[maybe_unused]] static configuration_t configuration_show_all{ option_t::level, option_t::location, option_t::date, option_t::location };
+[[maybe_unused]] static configuration_t configuration_show_all{ option_t::level, option_t::location, option_t::date, option_t::time };
 [[maybe_unused]] static configuration_t configuration_default{ option_t::level, option_t::time, option_t::location };
 
 /// @brief Logger class for managing log entries with configurations and color options.
