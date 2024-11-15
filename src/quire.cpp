@@ -102,7 +102,7 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const configuration_t &_config) noexcept
+logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const std::vector<option_t> &_configuration) noexcept
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
@@ -110,7 +110,7 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator, c
       min_level(_min_level),
       last_log_ended_with_newline(true),
       enable_color(true),
-      config(_config),
+      configuration(_configuration),
       separator(_separator),
       buffer(nullptr),
       buffer_length(0),
@@ -139,7 +139,7 @@ logger_t::logger_t(logger_t &&other) noexcept
       min_level(other.min_level),
       last_log_ended_with_newline(other.last_log_ended_with_newline),
       enable_color(other.enable_color),
-      config(std::move(other.config)),
+      configuration(std::move(other.configuration)),
       separator(other.separator),
       buffer(other.buffer),
       buffer_length(other.buffer_length)
@@ -164,8 +164,8 @@ void logger_t::print_logger_state() const
     std::cout << "min_level     : " << static_cast<int>(min_level) << '\n';
     std::cout << "LLEWNL        : " << (last_log_ended_with_newline ? "true" : "false") << '\n';
     std::cout << "enable_color  : " << (enable_color ? "true" : "false") << '\n';
-    std::cout << "config        : { ";
-    for (const auto &option : config) {
+    std::cout << "configuration : { ";
+    for (const auto &option : configuration) {
         std::cout << static_cast<int>(option) << " ";
     }
     std::cout << "}\n";
@@ -253,6 +253,18 @@ logger_t &logger_t::set_color(log_level level, const char *fg, const char *bg)
         fg_colors[level] = fg;
         bg_colors[level] = bg;
     }
+    return *this;
+}
+
+logger_t &logger_t::toggle_color(bool enable)
+{
+    enable_color = enable;
+    return *this;
+}
+
+logger_t &logger_t::configure(const std::vector<option_t> &_configuration)
+{
+    configuration = _configuration;
     return *this;
 }
 
@@ -362,14 +374,14 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         if (!header.empty()) {
             ss << header << " " << separator << " ";
         }
-        for (std::size_t i = 0; i < config.size(); ++i) {
-            if (config[i] == option_t::level) {
+        for (std::size_t i = 0; i < configuration.size(); ++i) {
+            if (configuration[i] == option_t::level) {
                 ss << __log_level_to_string(level) << " " << separator << " ";
-            } else if (config[i] == option_t::date) {
+            } else if (configuration[i] == option_t::date) {
                 ss << __get_date() << " " << separator << " ";
-            } else if (config[i] == option_t::time) {
+            } else if (configuration[i] == option_t::time) {
                 ss << __get_time() << " " << separator << " ";
-            } else if ((config[i] == option_t::location) && !location.empty()) {
+            } else if ((configuration[i] == option_t::location) && !location.empty()) {
                 ss << std::left << std::setw(16) << location << " " << separator << " ";
             }
         }

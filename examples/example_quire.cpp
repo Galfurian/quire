@@ -8,7 +8,7 @@ int main(int, char *[])
 {
     quire::logger_t l0("l0", quire::log_level::debug, '|');
     l0.toggle_color(true);
-    l0.configure(quire::configuration_show_all);
+    l0.configure(quire::logger_t::get_show_all_configuation());
 
     qdebug(l0, "Hello there!\n");
     qdebug(l0, "\n");

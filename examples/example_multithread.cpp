@@ -52,13 +52,13 @@ int main(int, char *[])
     auto &admin  = quire::create_logger(channel_admin, "admin", quire::log_level::debug, '|');
 
     local.set_color(quire::debug, quire::ansi::fg::bright_cyan, quire::ansi::util::reset);
-    local.configure(quire::configuration_show_all);
+    local.configure(quire::logger_t::get_show_all_configuation());
 
     global.set_color(quire::debug, quire::ansi::fg::bright_yellow, quire::ansi::util::reset);
-    global.configure(quire::configuration_show_all);
+    global.configure(quire::logger_t::get_show_all_configuation());
 
     admin.set_color(quire::debug, quire::ansi::fg::bright_red, quire::ansi::util::reset);
-    admin.configure(quire::configuration_show_all);
+    admin.configure(quire::logger_t::get_show_all_configuation());
 
     std::thread producer(producer_fun);
     std::thread consumer(consumer_fun);

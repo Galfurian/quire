@@ -85,11 +85,6 @@ enum class option_t {
     time
 };
 
-using configuration_t = std::vector<option_t>;
-
-[[maybe_unused]] static configuration_t configuration_show_all{ option_t::level, option_t::location, option_t::date, option_t::time };
-[[maybe_unused]] static configuration_t configuration_default{ option_t::level, option_t::time, option_t::location };
-
 /// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
@@ -102,7 +97,7 @@ public:
         std::string _header,
         log_level _min_level,
         char _separator,
-        const configuration_t &_config = configuration_default) noexcept;
+        const std::vector<option_t> &_config = get_default_configuation()) noexcept;
 
     /// @brief Move constructor.
     /// @param other The logger instance to move from.
@@ -155,20 +150,12 @@ public:
     /// @brief Enables or disables colored output.
     /// @param enable Whether to enable or disable colored output.
     /// @return Reference to the logger instance.
-    logger_t &toggle_color(bool enable)
-    {
-        enable_color = enable;
-        return *this;
-    }
+    logger_t &toggle_color(bool enable);
 
     /// @brief Configures display options using bitmask settings.
     /// @param _config Header configuration.
     /// @return Reference to the logger instance.
-    logger_t &configure(const configuration_t &_config)
-    {
-        config = _config;
-        return *this;
-    }
+    logger_t &configure(const std::vector<option_t> &_config);
 
     /// @brief Logs a message with formatting.
     /// @param level Log level.
@@ -183,6 +170,18 @@ public:
     void log(log_level level, char const *file, int line, char const *format, ...);
 
     void print_logger_state() const;
+
+    static inline std::vector<option_t> &get_default_configuation()
+    {
+        static std::vector<option_t> configuration{ option_t::level, option_t::time, option_t::location };
+        return configuration;
+    }
+
+    static inline std::vector<option_t> &get_show_all_configuation()
+    {
+        static std::vector<option_t> configuration{ option_t::level, option_t::location, option_t::date, option_t::time };
+        return configuration;
+    }
 
 private:
     /// @brief Helper for formatting messages.
@@ -210,7 +209,7 @@ private:
     log_level min_level;                      ///< Minimum log level threshold.
     mutable bool last_log_ended_with_newline; ///< Tracks if last log ended with newline.
     bool enable_color;                        ///< Are colors enabled.
-    configuration_t config;                   ///< Configuration of shown information.
+    std::vector<option_t> configuration;      ///< Configuration of shown information.
     char separator;                           ///< Separator character for log components.
     char *buffer;                             ///< Buffer for formatting log messages.
     std::size_t buffer_length;                ///< Current buffer size.

@@ -23,7 +23,7 @@ int main(int, char *[])
 
     l0.set_header("L0");
     l0.set_log_level(quire::log_level::debug);
-    l0.configure(quire::configuration_show_all);
+    l0.configure(quire::logger_t::get_show_all_configuation());
 
     std::cout << "We are saving the log to `" << log_filename << "`.\n";
 
