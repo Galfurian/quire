@@ -371,11 +371,10 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
     // == LOG INFORMATION =====================================================
     // Add the header only if the previous log ended with a newline
     if (last_log_ended_with_newline) {
-        if (!header.empty()) {
-            ss << header << " " << separator << " ";
-        }
         for (std::size_t i = 0; i < configuration.size(); ++i) {
-            if (configuration[i] == option_t::level) {
+            if ((configuration[i] == option_t::header) && !header.empty()) {
+                ss << header << " " << separator << " ";
+            } else if (configuration[i] == option_t::level) {
                 ss << __log_level_to_string(level) << " " << separator << " ";
             } else if (configuration[i] == option_t::date) {
                 ss << __get_date() << " " << separator << " ";

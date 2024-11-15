@@ -79,6 +79,7 @@ enum log_level {
 
 /// @brief Configuration bitmasks.
 enum class option_t {
+    header,
     level,
     location,
     date,
@@ -173,13 +174,13 @@ public:
 
     static inline std::vector<option_t> &get_default_configuation()
     {
-        static std::vector<option_t> configuration{ option_t::level, option_t::time, option_t::location };
+        static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::time, option_t::location };
         return configuration;
     }
 
     static inline std::vector<option_t> &get_show_all_configuation()
     {
-        static std::vector<option_t> configuration{ option_t::level, option_t::location, option_t::date, option_t::time };
+        static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::date, option_t::time, option_t::location };
         return configuration;
     }
 
