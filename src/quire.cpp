@@ -392,7 +392,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         ss.write(line, static_cast<std::streamsize>(length));
 
         // Update the newline flag based on the current message's last character.
-        last_log_ended_with_newline = (length > 0 && line[length - 1] == '\n');
+        last_log_ended_with_newline = (length > 0 && ((line[length - 1] == '\n') || (line[length - 1] == '\r')));
     }
 
     // == WRITE TO FILE STREAM ================================================
@@ -413,6 +413,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
         if (enable_color) {
             (*ostream) << ansi::util::reset;
         }
+        std::flush(*ostream);
     }
 }
 
