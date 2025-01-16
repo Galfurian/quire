@@ -55,7 +55,7 @@ public:
     /// @param _min_level The minimum log level required for messages to be logged.
     /// @param _separator The separator character between log components.
     /// @return A shared pointer to the newly created logger.
-    registry_t::value_t &create(const registry_t::key_t key, std::string _header, log_level _min_level, char _separator);
+    registry_t::value_t &create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator);
 
     /// @brief Removes the logger associated with the given key.
     /// @param key The key associated with the logger.
@@ -139,7 +139,7 @@ inline registry_t::value_t &get_logger(registry_t::key_t key)
 inline registry_t::value_t &create_logger(
     registry_t::key_t key,
     std::string _header,
-    quire::log_level _min_level,
+    unsigned _min_level,
     char _separator)
 {
     return registry_t::instance().create(key, _header, _min_level, _separator);

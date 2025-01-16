@@ -93,24 +93,24 @@ endif()
 
 if(BUILD_EXAMPLES)
 
-    # Add the example.
     add_executable(${PROJECT_NAME}_example_quire ${PROJECT_SOURCE_DIR}/examples/example_quire.cpp)
-    # Set the linked libraries.
+    target_include_directories(${PROJECT_NAME}_example_quire PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_quire PUBLIC ${PROJECT_NAME})
     
-    # Add the example.
     add_executable(${PROJECT_NAME}_example_registry ${PROJECT_SOURCE_DIR}/examples/example_registry.cpp)
-    # Set the linked libraries.
+    target_include_directories(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_NAME})
     
-    # Add the example.
     add_executable(${PROJECT_NAME}_example_log_file ${PROJECT_SOURCE_DIR}/examples/example_log_file.cpp)
-    # Set the linked libraries.
+    target_include_directories(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_NAME})
-    
-    # Add the example.
+
+    add_executable(${PROJECT_NAME}_example_custom_log_levels ${PROJECT_SOURCE_DIR}/examples/example_custom_log_levels.cpp)
+    target_include_directories(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_NAME})
+        
     add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
-    # Set the linked libraries.
+    target_include_directories(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} pthread)
     
 endif()

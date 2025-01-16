@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <map>
 
 /// @brief Quire source code.
 namespace quire
@@ -41,6 +42,7 @@ extern const char *bright_white;   ///< ANSI foreground color bright white.
 /// @brief Background colors.
 namespace bg
 {
+// Normal colors.
 extern const char *black;   ///< ANSI background color black.
 extern const char *red;     ///< ANSI background color red.
 extern const char *green;   ///< ANSI background color green.
@@ -49,6 +51,15 @@ extern const char *blue;    ///< ANSI background color blue.
 extern const char *magenta; ///< ANSI background color magenta.
 extern const char *cyan;    ///< ANSI background color cyan.
 extern const char *white;   ///< ANSI background color white.
+// Bright colors.
+extern const char *bright_black;   ///< ANSI background color bright black.
+extern const char *bright_red;     ///< ANSI background color bright red.
+extern const char *bright_green;   ///< ANSI background color bright green.
+extern const char *bright_yellow;  ///< ANSI background color bright yellow.
+extern const char *bright_blue;    ///< ANSI background color bright blue.
+extern const char *bright_magenta; ///< ANSI background color bright magenta.
+extern const char *bright_cyan;    ///< ANSI background color bright cyan.
+extern const char *bright_white;   ///< ANSI background color bright white.
 } // namespace bg
 /// @brief Utility escape codes.
 namespace util
@@ -68,7 +79,7 @@ extern const char *prevline;  ///< Move cursor to beginning of line, 1 line up.
 } // namespace util
 } // namespace ansi
 
-/// @brief Defines the log levels.
+/// @brief Defines the default log levels.
 enum log_level {
     debug    = 0, ///< Debug level.
     info     = 1, ///< Info level.
@@ -86,6 +97,13 @@ enum class option_t {
     time
 };
 
+/// @brief Log level details.
+struct log_level_config_t {
+    const char *name; ///< Name of the log level (e.g., DEBUG, INFO).
+    const char *fg;   ///< Foreground color (ANSI escape code).
+    const char *bg;   ///< Background color (ANSI escape code).
+};
+
 /// @brief Logger class for managing log entries with configurations and color options.
 class logger_t {
 public:
@@ -96,7 +114,7 @@ public:
     /// @param _config Header configuration.
     explicit logger_t(
         std::string _header,
-        log_level _min_level,
+        unsigned _min_level,
         char _separator,
         const std::vector<option_t> &_config = get_default_configuation()) noexcept;
 
@@ -110,11 +128,26 @@ public:
     /// @brief Retrieves the current header.
     std::string get_header() const;
 
+    /// @brief Clears all log levels from the logger.
+    /// @details This function removes all entries from the log levels map, including
+    /// both default and custom log levels. After this operation, no log levels will
+    /// exist, and logging will be effectively disabled until new levels are added.
+    void clear_log_levels();
+
+    /// @brief Adds a new log level or updates an existing one.
+    /// @param level The log level to add or update.
+    /// @param name The name for the log level.
+    /// @param fg The foreground color for the log level.
+    /// @param bg The background color for the log level.
+    /// @return `true` if the log level was updated, `false` if it was newly added.
+    logger_t &add_or_update_log_level(
+        unsigned level,
+        const char *name,
+        const char *fg = ansi::fg::white,
+        const char *bg = ansi::util::reset);
+
     /// @brief Retrieves the current log level.
-    log_level get_log_level() const;
-    /// @brief Resets the log colors to defaults.
-    /// @return Reference to the logger instance.
-    logger_t &reset_colors();
+    unsigned get_log_level() const;
 
     /// @brief Sets the file handler for log output.
     /// @param _fstream File handler instance.
@@ -134,7 +167,7 @@ public:
     /// @brief Sets the log level threshold.
     /// @param _level Minimum log level.
     /// @return Reference to the logger instance.
-    logger_t &set_log_level(log_level _level);
+    logger_t &set_log_level(unsigned _level);
 
     /// @brief Updates the separator character.
     /// @param _separator New separator character.
@@ -146,7 +179,7 @@ public:
     /// @param fg Foreground color (default: white).
     /// @param bg Background color (default: reset).
     /// @return Reference to the logger instance.
-    logger_t &set_color(log_level level, const char *fg, const char *bg);
+    logger_t &set_color(unsigned level, const char *fg, const char *bg);
 
     /// @brief Enables or disables colored output.
     /// @param enable Whether to enable or disable colored output.
@@ -161,14 +194,14 @@ public:
     /// @brief Logs a message with formatting.
     /// @param level Log level.
     /// @param format Format string.
-    void log(log_level level, char const *format, ...);
+    void log(unsigned level, char const *format, ...);
 
     /// @brief Logs a message with location information.
     /// @param level Log level.
     /// @param file Source file name.
     /// @param line Source line number.
     /// @param format Format string.
-    void log(log_level level, char const *file, int line, char const *format, ...);
+    void log(unsigned level, char const *file, int line, char const *format, ...);
 
     void print_logger_state() const;
 
@@ -185,6 +218,9 @@ public:
     }
 
 private:
+    /// @brief Initializes default log levels and their names.
+    void initialize_default_levels();
+
     /// @brief Helper for formatting messages.
     /// @param format Format string.
     /// @param args Variable arguments.
@@ -194,28 +230,28 @@ private:
     /// @param level Log level.
     /// @param location Source location.
     /// @param content Message content.
-    void write_log(log_level level, const std::string &location, const char *content) const;
+    void write_log(const log_level_config_t &level, const std::string &location, const char *content) const;
 
     /// @brief Writes formatted log information.
     /// @param level Log level.
     /// @param location Source location.
     /// @param line Message content.
     /// @param length Length of the message.
-    void write_log_line(log_level level, const std::string &location, const char *line, std::size_t length) const;
+    void write_log_line(const log_level_config_t &level, const std::string &location, const char *line, std::size_t length) const;
 
-    std::ostream *ostream;                    ///< Output stream for logging.
-    std::ostream *fstream;                    ///< File handler for output.
-    std::mutex mtx;                           ///< Mutex for thread safety.
-    std::string header;                       ///< Header for each log entry.
-    log_level min_level;                      ///< Minimum log level threshold.
-    mutable bool last_log_ended_with_newline; ///< Tracks if last log ended with newline.
-    bool enable_color;                        ///< Are colors enabled.
-    std::vector<option_t> configuration;      ///< Configuration of shown information.
-    char separator;                           ///< Separator character for log components.
-    char *buffer;                             ///< Buffer for formatting log messages.
-    std::size_t buffer_length;                ///< Current buffer size.
-    const char *fg_colors[5];                 ///< Foreground colors for each log level.
-    const char *bg_colors[5];                 ///< Background colors for each log level.
+    std::ostream *ostream;                             ///< Output stream for logging.
+    std::ostream *fstream;                             ///< File handler for output.
+    std::mutex mtx;                                    ///< Mutex for thread safety.
+    std::string header;                                ///< Header for each log entry.
+    unsigned min_level;                                ///< Minimum log level threshold.
+    mutable bool last_log_ended_with_newline;          ///< Tracks if last log ended with newline.
+    bool enable_color;                                 ///< Are colors enabled.
+    std::vector<option_t> configuration;               ///< Configuration of shown information.
+    char separator;                                    ///< Separator character for log components.
+    char *buffer;                                      ///< Buffer for formatting log messages.
+    std::size_t buffer_length;                         ///< Current buffer size.
+    std::map<unsigned, log_level_config_t> log_levels; ///< Custom log levels and their names.
+    int log_levels_max_name_length;                    ///< Maximum length of log level names.
 };
 
 } // namespace quire

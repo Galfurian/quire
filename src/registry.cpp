@@ -48,7 +48,7 @@ const registry_t::map_t &registry_t::loggers() const
     return m_map;
 }
 
-registry_t::value_t &registry_t::create(const registry_t::key_t key, std::string _header, log_level _min_level, char _separator)
+registry_t::value_t &registry_t::create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
 {
     std::lock_guard<std::mutex> lock(mtx);
 

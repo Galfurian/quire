@@ -40,7 +40,16 @@ const char *quire::ansi::bg::magenta = "\33[45m";
 const char *quire::ansi::bg::cyan    = "\33[46m";
 const char *quire::ansi::bg::white   = "\33[47m";
 
-const char *quire::ansi::util::reset     = "\33[0m";
+const char *quire::ansi::bg::bright_black   = "\33[40;1m";
+const char *quire::ansi::bg::bright_red     = "\33[41;1m";
+const char *quire::ansi::bg::bright_green   = "\33[42;1m";
+const char *quire::ansi::bg::bright_yellow  = "\33[43;1m";
+const char *quire::ansi::bg::bright_blue    = "\33[44;1m";
+const char *quire::ansi::bg::bright_magenta = "\33[45;1m";
+const char *quire::ansi::bg::bright_cyan    = "\33[46;1m";
+const char *quire::ansi::bg::bright_white   = "\33[47;1m";
+
+const char *quire::ansi::util::reset     = "\33[0m\033[49m";
 const char *quire::ansi::util::bold      = "\33[1m";
 const char *quire::ansi::util::underline = "\33[4m";
 const char *quire::ansi::util::reverse   = "\33[7m";
@@ -74,26 +83,6 @@ static inline std::string __get_time()
     return std::string(buffer);
 }
 
-/// @brief Transforms the log level to string.
-/// @param level the log level.
-/// @return the corresponding string.
-static inline const char *__log_level_to_string(log_level level)
-{
-    if (level == debug) {
-        return "debug   ";
-    }
-    if (level == info) {
-        return "info    ";
-    }
-    if (level == warning) {
-        return "warning ";
-    }
-    if (level == error) {
-        return "error   ";
-    }
-    return "critical";
-}
-
 /// @brief Combines filename and line number.
 static inline std::string __assemble_location(const std::string &file, int line)
 {
@@ -102,7 +91,7 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, log_level _min_level, char _separator, const std::vector<option_t> &_configuration) noexcept
+logger_t::logger_t(std::string _header, unsigned _min_level, char _separator, const std::vector<option_t> &_configuration) noexcept
     : ostream(&std::cout),
       fstream(NULL),
       mtx(),
@@ -114,22 +103,10 @@ logger_t::logger_t(std::string _header, log_level _min_level, char _separator, c
       separator(_separator),
       buffer(nullptr),
       buffer_length(0),
-      fg_colors(),
-      bg_colors()
+      log_levels(),
+      log_levels_max_name_length()
 {
-    // Default foreground colors.
-    fg_colors[debug]    = ansi::fg::cyan;
-    fg_colors[info]     = ansi::fg::bright_white;
-    fg_colors[warning]  = ansi::fg::bright_yellow;
-    fg_colors[error]    = ansi::fg::red;
-    fg_colors[critical] = ansi::fg::bright_red;
-
-    // By default we do not have background colors.
-    bg_colors[debug]    = quire::ansi::util::reset;
-    bg_colors[info]     = quire::ansi::util::reset;
-    bg_colors[warning]  = quire::ansi::util::reset;
-    bg_colors[error]    = quire::ansi::util::reset;
-    bg_colors[critical] = quire::ansi::util::reset;
+    this->initialize_default_levels();
 }
 
 logger_t::logger_t(logger_t &&other) noexcept
@@ -140,19 +117,26 @@ logger_t::logger_t(logger_t &&other) noexcept
       last_log_ended_with_newline(other.last_log_ended_with_newline),
       enable_color(other.enable_color),
       configuration(std::move(other.configuration)),
-      separator(other.separator),
+      separator(std::move(other.separator)),
       buffer(other.buffer),
-      buffer_length(other.buffer_length)
+      buffer_length(other.buffer_length),
+      log_levels(std::move(other.log_levels)),
+      log_levels_max_name_length(other.log_levels_max_name_length)
 {
-    // Move the fg_colors and bg_colors arrays
-    std::copy(std::begin(other.fg_colors), std::end(other.fg_colors), fg_colors);
-    std::copy(std::begin(other.bg_colors), std::end(other.bg_colors), bg_colors);
-
     // Nullify moved-from resources in `other`.
     other.ostream       = nullptr;
     other.fstream       = nullptr;
     other.buffer        = nullptr;
     other.buffer_length = 0;
+}
+
+void logger_t::initialize_default_levels()
+{
+    this->add_or_update_log_level(debug, "DEBUG", ansi::fg::cyan, quire::ansi::util::reset);
+    this->add_or_update_log_level(info, "INFO", ansi::fg::bright_white, quire::ansi::util::reset);
+    this->add_or_update_log_level(warning, "WARNING", ansi::fg::bright_yellow, quire::ansi::util::reset);
+    this->add_or_update_log_level(error, "ERROR", ansi::fg::red, quire::ansi::util::reset);
+    this->add_or_update_log_level(critical, "CRITICAL", ansi::fg::bright_red, quire::ansi::util::reset);
 }
 
 void logger_t::print_logger_state() const
@@ -172,14 +156,11 @@ void logger_t::print_logger_state() const
     std::cout << "separator     : " << separator << '\n';
     std::cout << "buffer        : " << (buffer ? "valid" : "null") << '\n';
     std::cout << "buffer_length : " << buffer_length << '\n';
-    std::cout << "fg_colors     : { ";
-    for (std::size_t i = 0; i < 5; ++i) {
-        std::cout << (fg_colors[i] ? "valid" : "null") << " ";
-    }
-    std::cout << "}\n";
-    std::cout << "bg_colors     : { ";
-    for (std::size_t i = 0; i < 5; ++i) {
-        std::cout << (bg_colors[i] ? "valid" : "null") << " ";
+    std::cout << "log_levels     : { ";
+    for (const auto &[level, properties] : log_levels) {
+        std::cout << "    Level " << level << " (" << properties.name << "): "
+                  << "Foreground: " << (properties.fg ? properties.fg : "default") << ", "
+                  << "Background: " << (properties.bg ? properties.bg : "default") << '\n';
     }
     std::cout << "}\n";
 }
@@ -189,32 +170,60 @@ logger_t::~logger_t()
     std::free(buffer);
 }
 
+void logger_t::clear_log_levels()
+{
+    std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety.
+    log_levels.clear();                    // Remove all log levels from the map.
+    log_levels_max_name_length = 0;
+}
+
+logger_t &logger_t::add_or_update_log_level(
+    unsigned level,
+    const char *name,
+    const char *fg,
+    const char *bg)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+
+    // Check if the log level already exists.
+    auto it = log_levels.find(level);
+    if (it != log_levels.end()) {
+        // Update the existing log level.
+        it->second.name = name;
+        it->second.fg   = fg;
+        it->second.bg   = bg;
+    } else {
+        // Add a new log level.
+        log_levels[level] = log_level_config_t{ name, fg, bg };
+    }
+
+    // Update max_level_name_length
+    log_levels_max_name_length = std::max(log_levels_max_name_length, static_cast<int>(std::strlen(name)));
+
+    return *this;
+}
+
+logger_t &logger_t::set_color(unsigned level, const char *fg, const char *bg)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+
+    auto it = log_levels.find(level);
+    if (it != log_levels.end()) {
+        it->second.fg = fg;
+        it->second.bg = bg;
+    }
+
+    return *this;
+}
+
 std::string logger_t::get_header() const
 {
     return header;
 }
 
-log_level logger_t::get_log_level() const
+unsigned logger_t::get_log_level() const
 {
     return min_level;
-}
-
-logger_t &logger_t::reset_colors()
-{
-    // Default foreground colors.
-    fg_colors[debug]    = ansi::fg::cyan;
-    fg_colors[info]     = ansi::fg::bright_white;
-    fg_colors[warning]  = ansi::fg::bright_yellow;
-    fg_colors[error]    = ansi::fg::red;
-    fg_colors[critical] = ansi::fg::bright_red;
-    // By default we do not have background colors.
-    bg_colors[debug]    = quire::ansi::util::reset;
-    bg_colors[info]     = quire::ansi::util::reset;
-    bg_colors[warning]  = quire::ansi::util::reset;
-    bg_colors[error]    = quire::ansi::util::reset;
-    bg_colors[critical] = quire::ansi::util::reset;
-
-    return *this;
 }
 
 logger_t &logger_t::set_file_handler(std::ostream *_fstream)
@@ -235,7 +244,7 @@ logger_t &logger_t::set_header(std::string _header)
     return *this;
 }
 
-logger_t &logger_t::set_log_level(log_level _level)
+logger_t &logger_t::set_log_level(unsigned _level)
 {
     min_level = _level;
     return *this;
@@ -244,15 +253,6 @@ logger_t &logger_t::set_log_level(log_level _level)
 logger_t &logger_t::set_separator(char _separator)
 {
     separator = _separator;
-    return *this;
-}
-
-logger_t &logger_t::set_color(log_level level, const char *fg, const char *bg)
-{
-    if ((level >= debug) && (level <= critical)) {
-        fg_colors[level] = fg;
-        bg_colors[level] = bg;
-    }
     return *this;
 }
 
@@ -307,12 +307,16 @@ void logger_t::format_message(char const *format, va_list args)
     }
 }
 
-void logger_t::log(log_level level, char const *format, ...)
+void logger_t::log(unsigned level, char const *format, ...)
 {
     // Ensure thread safety by locking the mutex.
     std::lock_guard<std::mutex> lock(mtx);
 
-    if (level >= min_level) {
+    // Check if the log level exists in the map.
+    auto it = log_levels.find(level);
+
+    // Check if we should log.
+    if ((it != log_levels.end()) && (level >= min_level)) {
         // Format the message.
         va_list args;
         va_start(args, format);
@@ -320,16 +324,20 @@ void logger_t::log(log_level level, char const *format, ...)
         va_end(args);
 
         // Pass the level, location, and buffer to do_log.
-        this->write_log(level, std::string(), buffer);
+        this->write_log(it->second, std::string(), buffer);
     }
 }
 
-void logger_t::log(log_level level, char const *file, int line, char const *format, ...)
+void logger_t::log(unsigned level, char const *file, int line, char const *format, ...)
 {
     // Ensure thread safety by locking the mutex.
     std::lock_guard<std::mutex> lock(mtx);
 
-    if (level >= min_level) {
+    // Check if the log level exists in the map.
+    auto it = log_levels.find(level);
+
+    // Check if we should log.
+    if ((it != log_levels.end()) && (level >= min_level)) {
         // Format the message.
         va_list args;
         va_start(args, format);
@@ -337,11 +345,11 @@ void logger_t::log(log_level level, char const *file, int line, char const *form
         va_end(args);
 
         // Pass the level, location, and buffer to do_log.
-        this->write_log(level, __assemble_location(file, line), buffer);
+        this->write_log(it->second, __assemble_location(file, line), buffer);
     }
 }
 
-void logger_t::write_log(log_level level, const std::string &location, const char *content) const
+void logger_t::write_log(const log_level_config_t &level, const std::string &location, const char *content) const
 {
     const char *start   = content;
     const char *newline = nullptr;
@@ -364,7 +372,7 @@ void logger_t::write_log(log_level level, const std::string &location, const cha
     }
 }
 
-void logger_t::write_log_line(log_level level, const std::string &location, const char *line, std::size_t length) const
+void logger_t::write_log_line(const log_level_config_t &level, const std::string &location, const char *line, std::size_t length) const
 {
     std::stringstream ss;
 
@@ -375,7 +383,7 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
             if ((configuration[i] == option_t::header) && !header.empty()) {
                 ss << header << " " << separator << " ";
             } else if (configuration[i] == option_t::level) {
-                ss << __log_level_to_string(level) << " " << separator << " ";
+                ss << std::left << std::setw(log_levels_max_name_length) << level.name << " " << separator << " ";
             } else if (configuration[i] == option_t::date) {
                 ss << __get_date() << " " << separator << " ";
             } else if (configuration[i] == option_t::time) {
@@ -402,8 +410,8 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
 
     if (ostream) {
         // == COLOR (ON) ======================================================
-        if (enable_color && (level >= debug) && (level <= critical)) {
-            (*ostream) << bg_colors[level] << fg_colors[level];
+        if (enable_color) {
+            (*ostream) << level.bg << level.fg;
         }
 
         // == WRITE STREAM ====================================================
@@ -411,9 +419,9 @@ void logger_t::write_log_line(log_level level, const std::string &location, cons
 
         // == COLOR (OFF) =====================================================
         if (enable_color) {
-            (*ostream) << ansi::util::reset;
+            (*ostream) << ansi::util::reset << ansi::util::clearline;
         }
-        std::flush(*ostream);
+        (*ostream) << std::flush;
     }
 }
 
