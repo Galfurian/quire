@@ -47,6 +47,7 @@ public:
     explicit registry_t();
 
     /// @brief Returns a copy of the loggers map.
+    /// @return A copy of the loggers map.
     const map_t &loggers() const;
 
     /// @brief Creates a new logger and adds it to the registry.

@@ -11,6 +11,10 @@
 #include <mutex>
 #include <map>
 
+#define QUIRE_MAJOR_VERSION 1 ///< Major version of the library.
+#define QUIRE_MINOR_VERSION 0 ///< Minor version of the library.
+#define QUIRE_MICRO_VERSION 0 ///< Micro version of the library.
+
 /// @brief Quire source code.
 namespace quire
 {
@@ -126,6 +130,7 @@ public:
     ~logger_t();
 
     /// @brief Retrieves the current header.
+    /// @return The current header.
     std::string get_header() const;
 
     /// @brief Clears all log levels from the logger.
@@ -147,6 +152,7 @@ public:
         const char *bg = ansi::util::reset);
 
     /// @brief Retrieves the current log level.
+    /// @return The current log level.
     unsigned get_log_level() const;
 
     /// @brief Sets the file handler for log output.
