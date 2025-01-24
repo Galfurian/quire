@@ -48,42 +48,70 @@ find_package(Doxygen)
 # -----------------------------------------------------------------------------
 
 # Add the C++ Library.
-add_library(${PROJECT_NAME}
+add_library(quire
     ${PROJECT_SOURCE_DIR}/src/quire.cpp
     ${PROJECT_SOURCE_DIR}/src/registry.cpp
 )
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(quire::quire ALIAS quire)
 # Include header directories, and link libraries.
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(quire PUBLIC ${PROJECT_SOURCE_DIR}/include)
+# Set compiler flags.
+target_compile_features(quire PUBLIC cxx_std_11)
 
 # -----------------------------------------------------------------------------
 # COMPILATION FLAGS
 # -----------------------------------------------------------------------------
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # Disable warnings that suggest using MSVC-specific safe functions
-    target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+    # Disable warnings for MSVC-specific "safe" functions like strcpy_s, etc.,
+    # which are not portable and may clutter warning logs.
+    target_compile_definitions(quire PUBLIC _CRT_SECURE_NO_WARNINGS)
+
+    # Disable warning C4702: unreachable code.
+    add_compile_options(/wd4702)
+
     if(WARNINGS_AS_ERRORS)
-        target_compile_options(${PROJECT_NAME} PUBLIC /WX)
+        # Treat all warnings as errors to enforce stricter code quality.
+        target_compile_options(quire PUBLIC /WX)
     endif()
+
+    if(STRICT_WARNINGS)
+        # Enable external header management to suppress warnings in system and
+        # external headers, making it easier to focus on project-specific issues.
+        target_compile_options(quire PUBLIC /experimental:external)
+        target_compile_options(quire PUBLIC /external:I ${CMAKE_BINARY_DIR})
+        target_compile_options(quire PUBLIC /external:anglebrackets)
+        target_compile_options(quire PUBLIC /external:W0)
+
+        # Use a high warning level to catch as many potential issues as possible.
+        target_compile_options(quire PUBLIC /W4)
+
+        # Enforce standards-compliant behavior to avoid relying on MSVC-specific extensions.
+        target_compile_options(quire PUBLIC /permissive-)
+    endif()
+
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if(WARNINGS_AS_ERRORS)
-        target_compile_options(${PROJECT_NAME} PUBLIC -Werror)
+        # Treat all warnings as errors to enforce stricter code quality.
+        target_compile_options(quire PUBLIC -Werror)
     endif()
-endif()
 
-if(STRICT_WARNINGS)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        # Mark system headers as external for MSVC explicitly
-        # https://devblogs.microsoft.com/cppblog/broken-warnings-theory
-        target_compile_options(${PROJECT_NAME} PUBLIC /experimental:external)
-        target_compile_options(${PROJECT_NAME} PUBLIC /external:I ${CMAKE_BINARY_DIR})
-        target_compile_options(${PROJECT_NAME} PUBLIC /external:anglebrackets)
-        target_compile_options(${PROJECT_NAME} PUBLIC /external:W0)
+    if(STRICT_WARNINGS)
+        # Enable a broad set of warnings to catch common and subtle issues:
+        target_compile_options(quire PUBLIC
+            -Wall                # Enable most general-purpose warnings.
+            -Wextra              # Enable extra warnings not included in -Wall.
+            -Wconversion         # Warn about implicit type conversions that may lose data.
+            -pedantic            # Enforce strict compliance with the C++ standard.
+            -Wshadow             # Warn about variable shadowing, which can cause subtle bugs.
+            -Wnon-virtual-dtor   # Warn when a class with virtual functions lacks a virtual destructor.
+            -Wnull-dereference   # Warn about potential null pointer dereferences.
+            -Wformat=2           # Enable strict checks for printf/scanf format strings.
+            -Woverloaded-virtual # Warn when a derived class function hides a base class virtual function.
+            -Wfloat-equal        # Warn about direct comparisons of floating-point values, which can be imprecise.
+            -Wno-format-y2k      # Do not warn about %e, %E, %f, %g, %G formats.
+        )
 
-        target_compile_options(${PROJECT_NAME} PUBLIC /W4)
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wextra -Wconversion -pedantic)
     endif()
 endif()
 
@@ -93,25 +121,25 @@ endif()
 
 if(BUILD_EXAMPLES)
 
-    add_executable(${PROJECT_NAME}_example_quire ${PROJECT_SOURCE_DIR}/examples/example_quire.cpp)
-    target_include_directories(${PROJECT_NAME}_example_quire PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_quire PUBLIC ${PROJECT_NAME})
+    add_executable(quire_example_quire ${PROJECT_SOURCE_DIR}/examples/example_quire.cpp)
+    target_include_directories(quire_example_quire PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(quire_example_quire PUBLIC quire)
     
-    add_executable(${PROJECT_NAME}_example_registry ${PROJECT_SOURCE_DIR}/examples/example_registry.cpp)
-    target_include_directories(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_registry PUBLIC ${PROJECT_NAME})
+    add_executable(quire_example_registry ${PROJECT_SOURCE_DIR}/examples/example_registry.cpp)
+    target_include_directories(quire_example_registry PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(quire_example_registry PUBLIC quire)
     
-    add_executable(${PROJECT_NAME}_example_log_file ${PROJECT_SOURCE_DIR}/examples/example_log_file.cpp)
-    target_include_directories(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_log_file PUBLIC ${PROJECT_NAME})
+    add_executable(quire_example_log_file ${PROJECT_SOURCE_DIR}/examples/example_log_file.cpp)
+    target_include_directories(quire_example_log_file PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(quire_example_log_file PUBLIC quire)
 
-    add_executable(${PROJECT_NAME}_example_custom_log_levels ${PROJECT_SOURCE_DIR}/examples/example_custom_log_levels.cpp)
-    target_include_directories(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_NAME})
+    add_executable(quire_example_custom_log_levels ${PROJECT_SOURCE_DIR}/examples/example_custom_log_levels.cpp)
+    target_include_directories(quire_example_custom_log_levels PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(quire_example_custom_log_levels PUBLIC quire)
         
-    add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
-    target_include_directories(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} pthread)
+    add_executable(quire_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
+    target_include_directories(quire_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(quire_example_multithread PUBLIC quire pthread)
     
 endif()
 
@@ -143,7 +171,7 @@ if(DOXYGEN_FOUND)
 
     # = CUSTOMIZATION =========================================================
     set(DOXYGEN_WARN_FORMAT "$file:$line: $text")
-    set(DOXYGEN_PROJECT_NAME ${PROJECT_NAME})
+    set(DOXYGEN_PROJECT_NAME quire)
     set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${PROJECT_SOURCE_DIR}/README.md)
     set(DOXYGEN_SHOW_INCLUDE_FILES NO)
     set(DOXYGEN_GENERATE_TREEVIEW YES)
@@ -155,7 +183,7 @@ if(DOXYGEN_FOUND)
         ${doxygenawesome_SOURCE_DIR}/doxygen-awesome-darkmode-toggle.js
     )
     doxygen_add_docs(
-        ${PROJECT_NAME}_documentation
+        quire_documentation
         ${PROJECT_SOURCE_DIR}/README.md
         ${PROJECT_SOURCE_DIR}/include/quire/quire.hpp
         ${PROJECT_SOURCE_DIR}/include/quire/registry.hpp
