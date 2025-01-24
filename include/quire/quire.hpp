@@ -203,14 +203,19 @@ public:
     /// @param format Format string.
     void log(unsigned level, char const *file, int line, char const *format, ...);
 
+    /// @brief Prints on output the overall state of the logger.
     void print_logger_state() const;
 
+    /// @brief Returns the default configuration for the logger.
+    /// @return the default configuration for the logger.
     static inline std::vector<option_t> &get_default_configuation()
     {
         static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::time, option_t::location };
         return configuration;
     }
 
+    /// @brief Returns a configuration that shows all information.
+    /// @return the configuration that shows all information.
     static inline std::vector<option_t> &get_show_all_configuation()
     {
         static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::date, option_t::time, option_t::location };

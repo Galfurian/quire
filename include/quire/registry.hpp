@@ -147,7 +147,6 @@ inline registry_t::value_t &create_logger(
 
 /// @brief Removes a logger from the registry by key.
 /// @param key The key associated with the logger.
-/// @return A shared pointer to the removed logger.
 inline void remove_logger(registry_t::key_t key)
 {
     registry_t::instance().remove(key);
