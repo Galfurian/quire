@@ -99,17 +99,18 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Cl
     if(STRICT_WARNINGS)
         # Enable a broad set of warnings to catch common and subtle issues:
         target_compile_options(quire PUBLIC
-            -Wall                # Enable most general-purpose warnings.
-            -Wextra              # Enable extra warnings not included in -Wall.
-            -Wconversion         # Warn about implicit type conversions that may lose data.
-            -pedantic            # Enforce strict compliance with the C++ standard.
-            -Wshadow             # Warn about variable shadowing, which can cause subtle bugs.
-            -Wnon-virtual-dtor   # Warn when a class with virtual functions lacks a virtual destructor.
-            -Wnull-dereference   # Warn about potential null pointer dereferences.
-            -Wformat=2           # Enable strict checks for printf/scanf format strings.
-            -Woverloaded-virtual # Warn when a derived class function hides a base class virtual function.
-            -Wfloat-equal        # Warn about direct comparisons of floating-point values, which can be imprecise.
-            -Wno-format-y2k      # Do not warn about %e, %E, %f, %g, %G formats.
+            -Wall                  # Enable most general-purpose warnings.
+            -Wextra                # Enable extra warnings not included in -Wall.
+            -Wconversion           # Warn about implicit type conversions that may lose data.
+            -pedantic              # Enforce strict compliance with the C++ standard.
+            -Wshadow               # Warn about variable shadowing, which can cause subtle bugs.
+            -Wnon-virtual-dtor     # Warn when a class with virtual functions lacks a virtual destructor.
+            -Wnull-dereference     # Warn about potential null pointer dereferences.
+            -Wformat=2             # Enable strict checks for printf/scanf format strings.
+            -Woverloaded-virtual   # Warn when a derived class function hides a base class virtual function.
+            -Wfloat-equal          # Warn about direct comparisons of floating-point values, which can be imprecise.
+            -Wno-format-y2k        # Do not warn about %e, %E, %f, %g, %G formats.
+            -Wno-format-nonliteral # Do not check for nonliteral.
         )
 
     endif()
