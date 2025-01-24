@@ -157,10 +157,10 @@ void logger_t::print_logger_state() const
     std::cout << "buffer        : " << (buffer ? "valid" : "null") << '\n';
     std::cout << "buffer_length : " << buffer_length << '\n';
     std::cout << "log_levels     : { ";
-    for (const auto &[level, properties] : log_levels) {
-        std::cout << "    Level " << level << " (" << properties.name << "): "
-                  << "Foreground: " << (properties.fg ? properties.fg : "default") << ", "
-                  << "Background: " << (properties.bg ? properties.bg : "default") << '\n';
+    for (const auto &level : log_levels) {
+        std::cout << "    Level " << level.first << " (" << level.second.name << "): "
+                  << "Foreground: " << (level.second.fg ? level.second.fg : "default") << ", "
+                  << "Background: " << (level.second.bg ? level.second.bg : "default") << '\n';
     }
     std::cout << "}\n";
 }
