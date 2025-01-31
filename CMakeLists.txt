@@ -162,7 +162,7 @@ if(DOXYGEN_FOUND)
     set(QUIRE_MICRO_VERSION ${CMAKE_MATCH_1})
 
     # Customization: Doxygen Configuration
-    set(DOXYGEN_WARN_FORMAT "$file:$line: $text")
+    set(DOXYGEN_WARN_FORMAT "$file:$line:1: $text")
     set(DOXYGEN_PROJECT_NAME quire)
     set(DOXYGEN_PROJECT_BRIEF "A lightweight logging library for C++")
     set(DOXYGEN_PROJECT_NUMBER "${QUIRE_MAJOR_VERSION}.${QUIRE_MINOR_VERSION}.${QUIRE_MICRO_VERSION}")
