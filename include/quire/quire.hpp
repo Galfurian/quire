@@ -156,6 +156,7 @@ public:
     /// @brief Logs a message with formatting.
     /// @param level Log level.
     /// @param format Format string.
+    /// @param args the argumeents.
     template <typename... Args>
     void log(unsigned level, const char *format, Args &&...args)
     {
@@ -176,6 +177,7 @@ public:
     /// @param file Source file name.
     /// @param line Source line number.
     /// @param format Format string.
+    /// @param args the argumeents.
     template <typename... Args>
     void log(unsigned level, const char *file, int line, const char *format, Args &&...args)
     {
