@@ -16,7 +16,7 @@
 
 enum : unsigned char {
     QUIRE_MAJOR_VERSION = 1, ///< Major version of the library.
-    QUIRE_MINOR_VERSION = 0, ///< Minor version of the library.
+    QUIRE_MINOR_VERSION = 1, ///< Minor version of the library.
     QUIRE_MICRO_VERSION = 0  ///< Micro version of the library.
 };
 
