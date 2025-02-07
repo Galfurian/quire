@@ -4,7 +4,7 @@ layout: default
 
 # Quire
 
-## A Lightweight and Configurable Logging Library
+## Overview
 
 [![Ubuntu](https://github.com/Galfurian/quire/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/Galfurian/quire/actions/workflows/ubuntu.yml)
 [![Windows](https://github.com/Galfurian/quire/actions/workflows/windows.yml/badge.svg)](https://github.com/Galfurian/quire/actions/workflows/windows.yml)
