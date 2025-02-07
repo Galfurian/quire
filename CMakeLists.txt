@@ -36,13 +36,15 @@ mark_as_advanced(FORCE
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(WARNINGS_AS_ERRORS "Treat all warnings as errors" OFF)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 
 # -----------------------------------------------------------------------------
 # DEPENDENCY (SYSTEM LIBRARIES)
 # -----------------------------------------------------------------------------
 
 find_package(Doxygen)
+
+find_package(Threads REQUIRED)
 
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 
@@ -59,7 +61,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Include header directories, and link libraries.
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 # Set compiler flags.
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # -----------------------------------------------------------------------------
 # COMPILATION FLAGS
@@ -140,10 +142,10 @@ if(BUILD_EXAMPLES)
     add_executable(${PROJECT_NAME}_example_custom_log_levels ${PROJECT_SOURCE_DIR}/examples/example_custom_log_levels.cpp)
     target_include_directories(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_NAME})
-        
+
     add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
     target_include_directories(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} pthread)
+    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} Threads::Threads)
     
 endif()
 
