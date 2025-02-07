@@ -5,6 +5,7 @@
 #include "quire/registry.hpp"
 
 #include <string>
+#include <utility>
 
 namespace quire
 {
@@ -16,7 +17,7 @@ namespace detail
 /// @param s The string to be trimmed.
 /// @param padchar The characters to trim from the string.
 /// @return std::string The trimmed string.
-inline std::string trim(const std::string &s, const std::string &padchar = " ")
+inline auto trim(const std::string &s, const std::string &padchar = " ") -> std::string
 {
     std::string::size_type left  = s.find_first_not_of(padchar);
     std::string::size_type right = s.find_last_not_of(padchar);
@@ -28,7 +29,7 @@ inline std::string trim(const std::string &s, const std::string &padchar = " ")
 /// @param width The total width for alignment.
 /// @param fill The character used for padding the string.
 /// @return std::string The aligned string.
-inline std::string lalign(std::string s, std::string::size_type width, char fill = ' ')
+inline auto lalign(std::string s, std::string::size_type width, char fill = ' ') -> std::string
 {
     std::string::size_type pad = (width > s.length()) ? (width - s.length()) : 0;
     return s.append(pad, fill);
@@ -36,17 +37,10 @@ inline std::string lalign(std::string s, std::string::size_type width, char fill
 
 } // namespace detail
 
-registry_t::registry_t()
-    : m_map()
-    , mtx()
-{
-    // Nothing to do.
-}
+auto registry_t::loggers() const -> const registry_t::map_t & { return m_map; }
 
-const registry_t::map_t &registry_t::loggers() const { return m_map; }
-
-registry_t::value_t &
-registry_t::create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
+auto registry_t::create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
+    -> registry_t::value_t &
 {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -58,7 +52,7 @@ registry_t::create(const registry_t::key_t key, std::string _header, unsigned _m
     }
 
     // Insert the logger directly into the map and retrieve a reference to it.
-    auto insert_it = m_map.insert(std::make_pair(key, logger_t(_header, _min_level, _separator)));
+    auto insert_it = m_map.insert(std::make_pair(key, logger_t(std::move(_header), _min_level, _separator)));
     if (!insert_it.second) {
         std::stringstream ss;
         ss << "Failed to create logger `" << key << "`.";
@@ -76,7 +70,7 @@ void registry_t::remove(registry_t::key_t key)
 {
     std::lock_guard<std::mutex> lock(mtx);
     // Check if the logger exists.
-    iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     if (it != m_map.end()) {
         m_map.erase(it);
         this->adjust_header_length();
@@ -89,16 +83,16 @@ void registry_t::clear()
     m_map.clear();
 }
 
-bool registry_t::contains(registry_t::key_t key) const
+auto registry_t::contains(registry_t::key_t key) const -> bool
 {
-    const_iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     return it != m_map.end();
 }
 
-const registry_t::value_t &registry_t::get(registry_t::key_t key) const
+auto registry_t::get(registry_t::key_t key) const -> const registry_t::value_t &
 {
     // Check if the logger exists.
-    const_iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     if (it == m_map.end()) {
         std::stringstream ss;
         ss << "Logger `" << key << "` does not exists.";
@@ -107,10 +101,10 @@ const registry_t::value_t &registry_t::get(registry_t::key_t key) const
     return it->second;
 }
 
-registry_t::value_t &registry_t::get(registry_t::key_t key)
+auto registry_t::get(registry_t::key_t key) -> registry_t::value_t &
 {
     // Check if the logger exists.
-    iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     if (it == m_map.end()) {
         std::stringstream ss;
         ss << "Logger `" << key << "` does not exists.";
@@ -119,10 +113,10 @@ registry_t::value_t &registry_t::get(registry_t::key_t key)
     return it->second;
 }
 
-registry_t::value_t &registry_t::operator[](registry_t::key_t key)
+auto registry_t::operator[](registry_t::key_t key) -> registry_t::value_t &
 {
     // Check if the logger exists.
-    iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     if (it == m_map.end()) {
         std::stringstream ss;
         ss << "Logger `" << key << "` does not exists.";
@@ -131,10 +125,10 @@ registry_t::value_t &registry_t::operator[](registry_t::key_t key)
     return it->second;
 }
 
-const registry_t::value_t &registry_t::operator[](registry_t::key_t key) const
+auto registry_t::operator[](registry_t::key_t key) const -> const registry_t::value_t &
 {
     // Check if the logger exists.
-    const_iterator it = m_map.find(key);
+    auto it = m_map.find(key);
     if (it == m_map.end()) {
         std::stringstream ss;
         ss << "Logger `" << key << "` does not exists.";
@@ -143,13 +137,13 @@ const registry_t::value_t &registry_t::operator[](registry_t::key_t key) const
     return it->second;
 }
 
-registry_t::iterator registry_t::begin() noexcept { return m_map.begin(); }
+auto registry_t::begin() noexcept -> registry_t::iterator { return m_map.begin(); }
 
-registry_t::const_iterator registry_t::begin() const noexcept { return m_map.begin(); }
+auto registry_t::begin() const noexcept -> registry_t::const_iterator { return m_map.begin(); }
 
-registry_t::iterator registry_t::end() noexcept { return m_map.end(); }
+auto registry_t::end() noexcept -> registry_t::iterator { return m_map.end(); }
 
-registry_t::const_iterator registry_t::end() const noexcept { return m_map.end(); }
+auto registry_t::end() const noexcept -> registry_t::const_iterator { return m_map.end(); }
 
 void registry_t::adjust_header_length()
 {
