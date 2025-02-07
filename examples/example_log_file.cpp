@@ -10,23 +10,24 @@ int main(int, char *[])
 {
     char log_filename[] = "h0.log";
 
-    auto l0 = std::make_shared<quire::logger_t>("L0", quire::log_level::debug, '|');
-    auto h0 = std::make_shared<quire::file_handler_t>(log_filename, "w");
+    quire::logger_t l0("L0", quire::log_level::debug, '|');
 
-    l0->set_file_handler(h0);
-    l0->set_output_stream(nullptr);
+    std::ofstream file_stream(log_filename, std::ios::out | std::ios::app);
+    if (!file_stream) {
+        std::cerr << "Failed to open log file: " << log_filename << std::endl;
+        return -1; // Handle the error appropriately
+    }
 
-    l0->set_header("L0");
-    l0->set_log_level(quire::log_level::debug);
-    l0->toggle_color(true);
-    l0->toggle_level(true);
-    l0->toggle_date(true);
-    l0->toggle_time(true);
-    l0->toggle_location(true);
+    l0.set_file_handler(&file_stream);
+    l0.set_output_stream(nullptr);
+
+    l0.set_header("L0");
+    l0.set_log_level(quire::log_level::debug);
+    l0.configure(quire::logger_t::get_show_all_configuation());
 
     std::cout << "We are saving the log to `" << log_filename << "`.\n";
 
-    qdebug(l0, "Hello there, I'm logging on file!");
+    qdebug(l0, "Hello there, I'm logging on file!\n");
 
     return 0;
 }
