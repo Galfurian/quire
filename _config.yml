@@ -1,5 +1,5 @@
-title: TIMELIB
-description: A lightweight C++ library designed for time measurement and benchmarking.
+title: Quire
+description: A lightweight and configurable C++ logging library.
 author: Enrico Fraccaroli
 show_downloads: false
 google_analytics:
