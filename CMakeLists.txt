@@ -44,6 +44,8 @@ option(BUILD_EXAMPLES "Build examples" ON)
 
 find_package(Doxygen)
 
+find_package(Threads REQUIRED)
+
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 
 # -----------------------------------------------------------------------------
@@ -140,10 +142,10 @@ if(BUILD_EXAMPLES)
     add_executable(${PROJECT_NAME}_example_custom_log_levels ${PROJECT_SOURCE_DIR}/examples/example_custom_log_levels.cpp)
     target_include_directories(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_custom_log_levels PUBLIC ${PROJECT_NAME})
-        
+
     add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
     target_include_directories(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
-    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} pthread)
+    target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} Threads::Threads)
     
 endif()
 

@@ -10,7 +10,11 @@
 #include <mutex>
 #include <thread>
 
-enum channel_t { channel_local = 10, channel_global = 20, channel_admin = 30 };
+enum channel_t {
+    channel_local  = 10,
+    channel_global = 20,
+    channel_admin  = 30,
+};
 
 struct product_t {
     int a;
