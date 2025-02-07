@@ -6,10 +6,10 @@
 #pragma once
 
 #include <fstream>
-#include <vector>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <map>
+#include <vector>
 
 #define QUIRE_MAJOR_VERSION 1 ///< Major version of the library.
 #define QUIRE_MINOR_VERSION 0 ///< Minor version of the library.
@@ -93,13 +93,7 @@ enum log_level {
 };
 
 /// @brief Configuration bitmasks.
-enum class option_t {
-    header,
-    level,
-    location,
-    date,
-    time
-};
+enum class option_t { header, level, location, date, time };
 
 /// @brief Log level details.
 struct log_level_config_t {
@@ -109,7 +103,8 @@ struct log_level_config_t {
 };
 
 /// @brief Logger class for managing log entries with configurations and color options.
-class logger_t {
+class logger_t
+{
 public:
     /// @brief Constructs a logger with specified settings for formatting and filtering log entries.
     /// @param _header Header text included at the start of each log entry.
@@ -216,7 +211,8 @@ public:
     /// @return the default configuration for the logger.
     static inline std::vector<option_t> &get_default_configuation()
     {
-        static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::time, option_t::location };
+        static std::vector<option_t> configuration{
+            option_t::header, option_t::level, option_t::time, option_t::location};
         return configuration;
     }
 
@@ -224,7 +220,8 @@ public:
     /// @return the configuration that shows all information.
     static inline std::vector<option_t> &get_show_all_configuation()
     {
-        static std::vector<option_t> configuration{ option_t::header, option_t::level, option_t::date, option_t::time, option_t::location };
+        static std::vector<option_t> configuration{
+            option_t::header, option_t::level, option_t::date, option_t::time, option_t::location};
         return configuration;
     }
 
@@ -248,7 +245,9 @@ private:
     /// @param location Source location.
     /// @param line Message content.
     /// @param length Length of the message.
-    void write_log_line(const log_level_config_t &level, const std::string &location, const char *line, std::size_t length) const;
+    void
+    write_log_line(const log_level_config_t &level, const std::string &location, const char *line, std::size_t length)
+        const;
 
     std::ostream *ostream;                             ///< Output stream for logging.
     std::ostream *fstream;                             ///< File handler for output.

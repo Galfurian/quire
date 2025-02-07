@@ -4,13 +4,13 @@
 
 #include "quire/quire.hpp"
 
-#include <exception>
-#include <stdexcept>
 #include <cstdarg>
+#include <cstring>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <cstring>
+#include <stdexcept>
 #include <string>
 
 const char *quire::ansi::fg::black   = "\33[30m";
@@ -91,37 +91,41 @@ static inline std::string __assemble_location(const std::string &file, int line)
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
 }
 
-logger_t::logger_t(std::string _header, unsigned _min_level, char _separator, const std::vector<option_t> &_configuration) noexcept
-    : ostream(&std::cout),
-      fstream(NULL),
-      mtx(),
-      header(_header),
-      min_level(_min_level),
-      last_log_ended_with_newline(true),
-      enable_color(true),
-      configuration(_configuration),
-      separator(_separator),
-      buffer(nullptr),
-      buffer_length(0),
-      log_levels(),
-      log_levels_max_name_length()
+logger_t::logger_t(
+    std::string _header,
+    unsigned _min_level,
+    char _separator,
+    const std::vector<option_t> &_configuration) noexcept
+    : ostream(&std::cout)
+    , fstream(NULL)
+    , mtx()
+    , header(_header)
+    , min_level(_min_level)
+    , last_log_ended_with_newline(true)
+    , enable_color(true)
+    , configuration(_configuration)
+    , separator(_separator)
+    , buffer(nullptr)
+    , buffer_length(0)
+    , log_levels()
+    , log_levels_max_name_length()
 {
     this->initialize_default_levels();
 }
 
 logger_t::logger_t(logger_t &&other) noexcept
-    : ostream(other.ostream),
-      fstream(other.fstream),
-      header(std::move(other.header)),
-      min_level(other.min_level),
-      last_log_ended_with_newline(other.last_log_ended_with_newline),
-      enable_color(other.enable_color),
-      configuration(std::move(other.configuration)),
-      separator(std::move(other.separator)),
-      buffer(other.buffer),
-      buffer_length(other.buffer_length),
-      log_levels(std::move(other.log_levels)),
-      log_levels_max_name_length(other.log_levels_max_name_length)
+    : ostream(other.ostream)
+    , fstream(other.fstream)
+    , header(std::move(other.header))
+    , min_level(other.min_level)
+    , last_log_ended_with_newline(other.last_log_ended_with_newline)
+    , enable_color(other.enable_color)
+    , configuration(std::move(other.configuration))
+    , separator(std::move(other.separator))
+    , buffer(other.buffer)
+    , buffer_length(other.buffer_length)
+    , log_levels(std::move(other.log_levels))
+    , log_levels_max_name_length(other.log_levels_max_name_length)
 {
     // Nullify moved-from resources in `other`.
     other.ostream       = nullptr;
@@ -165,10 +169,7 @@ void logger_t::print_logger_state() const
     std::cout << "}\n";
 }
 
-logger_t::~logger_t()
-{
-    std::free(buffer);
-}
+logger_t::~logger_t() { std::free(buffer); }
 
 void logger_t::clear_log_levels()
 {
@@ -177,11 +178,7 @@ void logger_t::clear_log_levels()
     log_levels_max_name_length = 0;
 }
 
-logger_t &logger_t::add_or_update_log_level(
-    unsigned level,
-    const char *name,
-    const char *fg,
-    const char *bg)
+logger_t &logger_t::add_or_update_log_level(unsigned level, const char *name, const char *fg, const char *bg)
 {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -194,7 +191,7 @@ logger_t &logger_t::add_or_update_log_level(
         it->second.bg   = bg;
     } else {
         // Add a new log level.
-        log_levels[level] = log_level_config_t{ name, fg, bg };
+        log_levels[level] = log_level_config_t{name, fg, bg};
     }
 
     // Update max_level_name_length
@@ -216,15 +213,9 @@ logger_t &logger_t::set_color(unsigned level, const char *fg, const char *bg)
     return *this;
 }
 
-std::string logger_t::get_header() const
-{
-    return header;
-}
+std::string logger_t::get_header() const { return header; }
 
-unsigned logger_t::get_log_level() const
-{
-    return min_level;
-}
+unsigned logger_t::get_log_level() const { return min_level; }
 
 logger_t &logger_t::set_file_handler(std::ostream *_fstream)
 {
@@ -372,7 +363,11 @@ void logger_t::write_log(const log_level_config_t &level, const std::string &loc
     }
 }
 
-void logger_t::write_log_line(const log_level_config_t &level, const std::string &location, const char *line, std::size_t length) const
+void logger_t::write_log_line(
+    const log_level_config_t &level,
+    const std::string &location,
+    const char *line,
+    std::size_t length) const
 {
     std::stringstream ss;
 

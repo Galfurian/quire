@@ -37,18 +37,16 @@ inline std::string lalign(std::string s, std::string::size_type width, char fill
 } // namespace detail
 
 registry_t::registry_t()
-    : m_map(),
-      mtx()
+    : m_map()
+    , mtx()
 {
     // Nothing to do.
 }
 
-const registry_t::map_t &registry_t::loggers() const
-{
-    return m_map;
-}
+const registry_t::map_t &registry_t::loggers() const { return m_map; }
 
-registry_t::value_t &registry_t::create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
+registry_t::value_t &
+registry_t::create(const registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
 {
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -145,25 +143,13 @@ const registry_t::value_t &registry_t::operator[](registry_t::key_t key) const
     return it->second;
 }
 
-registry_t::iterator registry_t::begin() noexcept
-{
-    return m_map.begin();
-}
+registry_t::iterator registry_t::begin() noexcept { return m_map.begin(); }
 
-registry_t::const_iterator registry_t::begin() const noexcept
-{
-    return m_map.begin();
-}
+registry_t::const_iterator registry_t::begin() const noexcept { return m_map.begin(); }
 
-registry_t::iterator registry_t::end() noexcept
-{
-    return m_map.end();
-}
+registry_t::iterator registry_t::end() noexcept { return m_map.end(); }
 
-registry_t::const_iterator registry_t::end() const noexcept
-{
-    return m_map.end();
-}
+registry_t::const_iterator registry_t::end() const noexcept { return m_map.end(); }
 
 void registry_t::adjust_header_length()
 {

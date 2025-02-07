@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <exception>
-#include <stdexcept>
-#include <sstream>
 #include <mutex>
+#include <sstream>
+#include <stdexcept>
+#include <unordered_map>
 
 #include "quire/quire.hpp"
 
@@ -17,7 +17,8 @@ namespace quire
 {
 
 /// @brief Represents an exception specific to registry operations.
-class registry_exception_t : public std::runtime_error {
+class registry_exception_t : public std::runtime_error
+{
 public:
     /// @brief Constructs a new registry exception with a specific error message.
     /// @param message The error message describing the exception.
@@ -30,16 +31,17 @@ public:
 
 /// @brief Manages system-wide loggers and provides utilities for logger
 /// registration, lookup, and removal.
-class registry_t {
+class registry_t
+{
 public:
     /// @brief The unique identifier associated with each logger.
-    using key_t = std::uint8_t;
+    using key_t          = std::uint8_t;
     /// @brief The type used to store logger instances in the registry.
-    using value_t = logger_t;
+    using value_t        = logger_t;
     /// @brief The map structure that associates each key with a logger instance.
-    using map_t = std::unordered_map<registry_t::key_t, registry_t::value_t>;
+    using map_t          = std::unordered_map<registry_t::key_t, registry_t::value_t>;
     /// @brief An iterator type for non-constant access to the logger map.
-    using iterator = typename map_t::iterator;
+    using iterator       = typename map_t::iterator;
     /// @brief An iterator type for constant access to the logger map.
     using const_iterator = typename map_t::const_iterator;
 
@@ -126,10 +128,7 @@ public:
 /// @brief Retrieves a logger by key from the registry.
 /// @param key The key associated with the logger.
 /// @return A shared pointer to the requested logger.
-inline registry_t::value_t &get_logger(registry_t::key_t key)
-{
-    return registry_t::instance().get(key);
-}
+inline registry_t::value_t &get_logger(registry_t::key_t key) { return registry_t::instance().get(key); }
 
 /// @brief Creates a new logger in the registry.
 /// @param key The key associated with the logger.
@@ -137,27 +136,18 @@ inline registry_t::value_t &get_logger(registry_t::key_t key)
 /// @param _min_level The minimum logging level.
 /// @param _separator The separator character for log entries.
 /// @return A shared pointer to the created logger.
-inline registry_t::value_t &create_logger(
-    registry_t::key_t key,
-    std::string _header,
-    unsigned _min_level,
-    char _separator)
+inline registry_t::value_t &
+create_logger(registry_t::key_t key, std::string _header, unsigned _min_level, char _separator)
 {
     return registry_t::instance().create(key, _header, _min_level, _separator);
 }
 
 /// @brief Removes a logger from the registry by key.
 /// @param key The key associated with the logger.
-inline void remove_logger(registry_t::key_t key)
-{
-    registry_t::instance().remove(key);
-}
+inline void remove_logger(registry_t::key_t key) { registry_t::instance().remove(key); }
 
 /// @brief Returns a const reference to the map of loggers in the registry.
 /// @return const map_t& The map of registered loggers.
-inline const registry_t::map_t &loggers()
-{
-    return registry_t::instance().loggers();
-}
+inline const registry_t::map_t &loggers() { return registry_t::instance().loggers(); }
 
 } // namespace quire

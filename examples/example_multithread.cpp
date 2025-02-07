@@ -4,17 +4,13 @@
 
 #include <quire/registry.hpp>
 
+#include <chrono>
 #include <condition_variable>
 #include <iostream>
-#include <chrono>
-#include <thread>
 #include <mutex>
+#include <thread>
 
-enum channel_t {
-    channel_local  = 10,
-    channel_global = 20,
-    channel_admin  = 30
-};
+enum channel_t { channel_local = 10, channel_global = 20, channel_admin = 30 };
 
 struct product_t {
     int a;

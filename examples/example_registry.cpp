@@ -6,11 +6,7 @@
 
 #include <iostream>
 
-enum channel_t {
-    local  = 10,
-    global = 20,
-    admin  = 30
-};
+enum channel_t { local = 10, global = 20, admin = 30 };
 
 void registry_int()
 {
@@ -63,9 +59,12 @@ int main(int, char *[])
 
     registry_create();
 
-    quire::create_logger(local, "local", quire::log_level::debug, '|').configure(quire::logger_t::get_show_all_configuation());
-    quire::create_logger(global, "global", quire::log_level::debug, '|').configure(quire::logger_t::get_show_all_configuation());
-    quire::create_logger(admin, "admin", quire::log_level::debug, '|').configure(quire::logger_t::get_show_all_configuation());
+    quire::create_logger(local, "local", quire::log_level::debug, '|')
+        .configure(quire::logger_t::get_show_all_configuation());
+    quire::create_logger(global, "global", quire::log_level::debug, '|')
+        .configure(quire::logger_t::get_show_all_configuation());
+    quire::create_logger(admin, "admin", quire::log_level::debug, '|')
+        .configure(quire::logger_t::get_show_all_configuation());
     registry_enum();
     return 0;
 }
