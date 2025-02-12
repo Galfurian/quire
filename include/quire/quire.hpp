@@ -94,6 +94,9 @@ public:
     /// both default and custom log levels. After this operation, no log levels will
     /// exist, and logging will be effectively disabled until new levels are added.
     void clear_log_levels();
+    
+    /// @brief Resets to the default log levels and their names.
+    void reset_log_levels();
 
     /// @brief Adds a new log level or updates an existing one.
     /// @param level The log level to add or update.
@@ -226,16 +229,12 @@ private:
     /// @param line Source line number.
     static auto assemble_location(const std::string &file, int line) -> std::string;
 
-    /// @brief Initializes default log levels and their names.
-    void initialize_default_levels();
-
     /// @brief Helper for formatting messages.
     /// @param format Format string.
     /// @param args Variable arguments.
     template <typename... Args>
     void format_message(const char *format, Args &&...args)
     {
-        std::lock_guard<std::mutex> lock(mtx);
         if ((format == nullptr) || (std::strlen(format) == 0)) {
             // Clear buffer for empty format.
             buffer.clear();

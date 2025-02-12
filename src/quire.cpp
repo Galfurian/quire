@@ -113,7 +113,7 @@ logger_t::logger_t(
     , buffer()
     , log_levels_max_name_length()
 {
-    this->initialize_default_levels();
+    this->reset_log_levels();
 }
 
 logger_t::logger_t(logger_t &&other) noexcept
@@ -139,15 +139,6 @@ auto logger_t::assemble_location(const std::string &file, int line) -> std::stri
     std::stringstream ss;
     ss << line;
     return file.substr(file.find_last_of("/\\") + 1) + ":" + ss.str();
-}
-
-void logger_t::initialize_default_levels()
-{
-    this->add_or_update_log_level(debug, "DEBUG", ansi::fg::cyan, quire::ansi::util::reset);
-    this->add_or_update_log_level(info, "INFO", ansi::fg::bright_white, quire::ansi::util::reset);
-    this->add_or_update_log_level(warning, "WARNING", ansi::fg::bright_yellow, quire::ansi::util::reset);
-    this->add_or_update_log_level(error, "ERROR", ansi::fg::red, quire::ansi::util::reset);
-    this->add_or_update_log_level(critical, "CRITICAL", ansi::fg::bright_red, quire::ansi::util::reset);
 }
 
 void logger_t::print_logger_state() const
@@ -180,6 +171,16 @@ void logger_t::clear_log_levels()
     std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety.
     log_levels.clear();                    // Remove all log levels from the map.
     log_levels_max_name_length = 0;
+}
+
+void logger_t::reset_log_levels()
+{
+    this->clear_log_levels();
+    this->add_or_update_log_level(debug, "DEBUG", ansi::fg::cyan, quire::ansi::util::reset);
+    this->add_or_update_log_level(info, "INFO", ansi::fg::bright_white, quire::ansi::util::reset);
+    this->add_or_update_log_level(warning, "WARNING", ansi::fg::bright_yellow, quire::ansi::util::reset);
+    this->add_or_update_log_level(error, "ERROR", ansi::fg::red, quire::ansi::util::reset);
+    this->add_or_update_log_level(critical, "CRITICAL", ansi::fg::bright_red, quire::ansi::util::reset);
 }
 
 auto logger_t::add_or_update_log_level(unsigned level, const char *name, const char *fg, const char *bg) -> logger_t &
@@ -229,36 +230,42 @@ auto logger_t::set_file_handler(std::ostream *_fstream) -> logger_t &
 
 auto logger_t::set_output_stream(std::ostream *_ostream) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     ostream = _ostream;
     return *this;
 }
 
 auto logger_t::set_header(std::string _header) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     header = std::move(_header);
     return *this;
 }
 
 auto logger_t::set_log_level(unsigned _level) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     min_level = _level;
     return *this;
 }
 
 auto logger_t::set_separator(char _separator) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     separator = _separator;
     return *this;
 }
 
 auto logger_t::toggle_color(bool enable) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     enable_color = enable;
     return *this;
 }
 
 auto logger_t::configure(const std::vector<option_t> &_configuration) -> logger_t &
 {
+    std::lock_guard<std::mutex> lock(mtx);
     configuration = _configuration;
     return *this;
 }
