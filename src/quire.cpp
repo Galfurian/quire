@@ -274,23 +274,21 @@ void logger_t::write_log(const log_level_config_t &level, const std::string &loc
 {
     std::size_t start       = 0;
     std::size_t newline_pos = 0;
-
     // Split the buffer by lines and log each line individually.
-    while ((newline_pos = buffer.find('\n', start)) != std::string::npos) {
-        // Extract the line including the newline character.
-        std::string line = buffer.substr(start, newline_pos - start + 1);
+    while ((newline_pos = buffer.find_first_of("\n\r", start)) != std::string::npos) {
+        // Extract the line WITHOUT the newline character.
+        std::string line = buffer.substr(start, newline_pos - start);
 
-        // Log the line with the current location.
-        this->write_log_line(level, location, line, line.length());
+        // Log the line with the correct newline character.
+        this->write_log_line(level, location, line, buffer[newline_pos]);
 
         // Move to the next line.
         start = newline_pos + 1;
     }
-
     // Log any remaining content after the last newline.
     if (start < buffer.size()) {
         std::string remaining_line = buffer.substr(start);
-        this->write_log_line(level, location, remaining_line, remaining_line.length());
+        this->write_log_line(level, location, remaining_line, '\0');
     }
 }
 
@@ -298,12 +296,10 @@ void logger_t::write_log_line(
     const log_level_config_t &level,
     const std::string &location,
     const std::string &line,
-    std::size_t length) const
+    char newline) const
 {
     std::stringstream ss;
-
-    // == LOG INFORMATION =====================================================
-    // Add the header only if the previous log ended with a newline
+    // Add the header only if the previous log ended with a newline.
     if (last_log_ended_with_newline) {
         for (auto i : configuration) {
             if ((i == option_t::header) && !header.empty()) {
@@ -319,33 +315,31 @@ void logger_t::write_log_line(
             }
         }
     }
-
-    // Check that the line is not empty.
+    // Append the log message if it's not empty
     if (!line.empty()) {
-        // Write the actual log message.
-        ss.write(line.c_str(), static_cast<std::streamsize>(length));
-
-        // Update the newline flag based on the current message's last character.
-        last_log_ended_with_newline = (line.back() == '\n') || (line.back() == '\r');
+        ss.write(line.c_str(), static_cast<std::streamsize>(line.length()));
+        // Track if the last character was a newline or carriage return
+        last_log_ended_with_newline = (newline == '\n' || newline == '\r');
     }
-
-    // == WRITE TO FILE STREAM ================================================
+    // Write log entry to file if a file stream is set.
     if (fstream != nullptr) {
         (*fstream) << ss.str();
     }
-
+    // Write log entry to console/output stream if set.
     if (ostream != nullptr) {
-        // == COLOR (ON) ======================================================
+        // Apply foreground and background colors.
         if (enable_color) {
-            (*ostream) << level.bg << level.fg;
+            (*ostream) << ansi::util::reset << level.bg << level.fg;
         }
-
-        // == WRITE STREAM ====================================================
+        // Add the actual message.
         (*ostream) << ss.str();
-
-        // == COLOR (OFF) =====================================================
+        // Ensure colors are reset properly.
         if (enable_color) {
-            (*ostream) << ansi::util::reset << ansi::util::clearline;
+            (*ostream) << ansi::util::reset;
+        }
+        // Append newline or carriage return if present.
+        if (newline > 0) {
+            (*ostream) << newline;
         }
         (*ostream) << std::flush;
     }

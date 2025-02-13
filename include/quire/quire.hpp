@@ -17,7 +17,7 @@
 enum : unsigned char {
     QUIRE_MAJOR_VERSION = 1, ///< Major version of the library.
     QUIRE_MINOR_VERSION = 1, ///< Minor version of the library.
-    QUIRE_MICRO_VERSION = 1  ///< Micro version of the library.
+    QUIRE_MICRO_VERSION = 2  ///< Micro version of the library.
 };
 
 /// @brief Quire source code.
@@ -94,7 +94,7 @@ public:
     /// both default and custom log levels. After this operation, no log levels will
     /// exist, and logging will be effectively disabled until new levels are added.
     void clear_log_levels();
-    
+
     /// @brief Resets to the default log levels and their names.
     void reset_log_levels();
 
@@ -282,12 +282,10 @@ private:
     /// @param level Log level.
     /// @param location Source location.
     /// @param line Message content.
-    /// @param length Length of the message.
-    void write_log_line(
-        const log_level_config_t &level,
-        const std::string &location,
-        const std::string &line,
-        std::size_t length) const;
+    /// @param newline The newline character to append at the end of the line.
+    void
+    write_log_line(const log_level_config_t &level, const std::string &location, const std::string &line, char newline)
+        const;
 
     std::ostream *ostream;                             ///< Output stream for logging.
     std::ostream *fstream;                             ///< File handler for output.
