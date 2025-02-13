@@ -146,6 +146,10 @@ if(BUILD_EXAMPLES)
     add_executable(${PROJECT_NAME}_example_multithread ${PROJECT_SOURCE_DIR}/examples/example_multithread.cpp)
     target_include_directories(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${PROJECT_NAME}_example_multithread PUBLIC ${PROJECT_NAME} Threads::Threads)
+
+    add_executable(${PROJECT_NAME}_example_progress ${PROJECT_SOURCE_DIR}/examples/example_progress.cpp)
+    target_include_directories(${PROJECT_NAME}_example_progress PUBLIC ${PROJECT_SOURCE_DIR}/include)
+    target_link_libraries(${PROJECT_NAME}_example_progress PUBLIC ${PROJECT_NAME})
     
 endif()
 

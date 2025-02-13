@@ -16,7 +16,7 @@ int main(int, char *[])
 
     // Add 8 custom log levels.
     l0.add_or_update_log_level(0, "DEBUG", quire::ansi::fg::green, quire::ansi::util::reset);
-    l0.add_or_update_log_level(1, "INFO", quire::ansi::fg::cyan, quire::ansi::bg::white);
+    l0.add_or_update_log_level(1, "INFO", quire::ansi::fg::cyan, quire::ansi::bg::blue);
     l0.add_or_update_log_level(2, "NOTICE", quire::ansi::fg::blue, quire::ansi::util::reset);
     l0.add_or_update_log_level(3, "WARNING", quire::ansi::fg::yellow, quire::ansi::util::reset);
     l0.add_or_update_log_level(4, "ERROR", quire::ansi::fg::red, quire::ansi::util::reset);
