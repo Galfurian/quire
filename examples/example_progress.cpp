@@ -12,11 +12,11 @@ int main()
     quire::logger_t logger("progress", quire::log_level::info, '|');
     // logger.toggle_color(false);
 
-    const int total_steps = 100;
+    const std::size_t total_steps = 100;
 
-    for (int i = 0; i <= total_steps; ++i) {
-        int bar_width = 50;
-        int pos       = (i * bar_width) / total_steps;
+    for (std::size_t i = 0; i <= total_steps; ++i) {
+        std::size_t bar_width = 50;
+        std::size_t pos       = (i * bar_width) / total_steps;
 
         std::string progress_bar = "[" + std::string(pos, '=') + std::string(bar_width - pos, ' ') + "]";
 
